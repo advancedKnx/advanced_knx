@@ -1,0 +1,59 @@
+{
+  "name": "advanced_knx",
+  "version": "2.3.4",
+  "main": "src/index.js",
+  "author": "Elias Karakoulakis <Elias.Karakoulakis@gmail.com>",
+  "private": false,
+  "license": "MIT",
+  "homepage": "https://github.com/advancedKnx/advanced_knx.git",
+  "repository": "git+https://github.com/advancedKnx/advanced_knx.git",
+  "maintainers": [
+    "noname <knx_code@protonmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/advancedKnx/advanced_knx/issues"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "build": "babel src -d dist",
+    "lint": "eslint src",
+    "liveTest": "babel-node test/RawMod/liveTest.js",
+    "functionTests": "babel-node test/RawMod/functionTests.js",
+    "test": "babel test -d dist/test; babel src -d dist/src; cp package.json dist/package.json; multi-tape dist/test/test-*.js",
+    "cleanup": "rm -r dist/*"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.52",
+    "@babel/core": "^7.0.0-beta.52",
+    "@babel/node": "^7.0.0-beta.52",
+    "@babel/preset-env": "^7.0.0-beta.52",
+    "babel-core": "^7.0.0-0",
+    "babel-jest": "^23.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-google": "^0.12.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "multi-tape": "^1.1.1",
+    "tape": "^4.6.2"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.0.0-beta.52",
+    "@babel/core": "^7.0.0-beta.52",
+    "@babel/node": "^7.0.0-beta.52",
+    "@babel/preset-env": "^7.0.0-beta.52",
+    "@types/node": "^6.0.48",
+    "babel-core": "^7.0.0-0",
+    "binary-parser": "1.1.5",
+    "binary-protocol": "0.0.0",
+    "caller-id": "^0.1.0",
+    "ipaddr.js": "1.2.0",
+    "jshint": "^2.10.2",
+    "log-driver": "1.2.7",
+    "machina": "^2.0.0-1"
+  }
+}
