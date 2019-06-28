@@ -159,8 +159,8 @@ export default class KnxReadDevMem {
           // Validate target
           if (KnxAddress.validateAddrStr(target) === -1 ||
               KnxAddress.getAddrType(target) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-            err = new Error(RawModErrors.ERR_WriteDevMem.INVALID_TARGET.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_WriteDevMem.INVALID_TARGET.errorID)
+            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_TARGET.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_TARGET.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -171,8 +171,8 @@ export default class KnxReadDevMem {
           if (source) {
             if (KnxAddress.validateAddrStr(source) === -1 ||
                 KnxAddress.getAddrType(source) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-              err = new Error(RawModErrors.ERR_WriteDevMem.INVALID_SOURCE.errorMsg)
-              rawModErr = errContext.createNewError(err, RawModErrors.ERR_WriteDevMem.INVALID_SOURCE.errorID)
+              err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_SOURCE.errorMsg)
+              rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_SOURCE.errorID)
 
               errContext.addNewError(rawModErr)
 

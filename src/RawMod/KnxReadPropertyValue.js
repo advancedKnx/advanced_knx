@@ -7,6 +7,8 @@ import KnxNetProtocol from './KnxNetProtocol'
 import RawModErrors from './Errors'
 import RawModCustomMsgHandlers from './CustomMsgHandlers'
 import RawModCustomMsgHandlerTemplates from './CustomMessageHandlerTemplates'
+import KnxAddress from './KnxAddress'
+import KnxConstants from '../KnxConstants'
 
 export default class KnxReadPropertyValue {
   /*
@@ -145,9 +147,42 @@ export default class KnxReadPropertyValue {
           }
         }
 
+        // Check the values of the target and the source arguments
+        const checkTargetAndSource = () => {
+          let retVal = 0
+
+          // Validate target
+          if (KnxAddress.validateAddrStr(target) === -1 ||
+            KnxAddress.getAddrType(target) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
+            err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_TARGET.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_TARGET.errorID)
+
+            errContext.addNewError(rawModErr)
+
+            retVal = 1
+          }
+
+          // Validate source, if defined
+          if (source) {
+            if (KnxAddress.validateAddrStr(source) === -1 ||
+              KnxAddress.getAddrType(source) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
+              err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_SOURCE.errorMsg)
+              rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_SOURCE.errorID)
+
+              errContext.addNewError(rawModErr)
+
+              retVal = 1
+            }
+          }
+
+          // Return
+          return retVal
+        }
+
         // Call the checking functions
         if (checkArgumentsDefined()) { return 1 }
         if (checkArgumentTypes()) { return 1 }
+        if (checkTargetAndSource()) { return 1 }
       }
 
       // This function forges all the needed messages
@@ -235,22 +270,22 @@ export default class KnxReadPropertyValue {
 
               // Return 1
               resolve(1)
+            } else {
+              // Send the memory read request
+              KnxNetProtocol.sendTunnRequest(propValReadReq, conContext, sendErr => {
+                // Check for errors
+                if (sendErr) {
+                  // Create the RawModError object
+                  rawModErr = errContext.createNewError(sendErr, null)
+
+                  // Push it onto the errorStack
+                  errContext.addNewError(rawModErr)
+
+                  // Return 1
+                  resolve(1)
+                }
+              })
             }
-
-            // Send the memory read request
-            KnxNetProtocol.sendTunnRequest(propValReadReq, conContext, sendErr => {
-              // Check for errors
-              if (sendErr) {
-                // Create the RawModError object
-                rawModErr = errContext.createNewError(sendErr, null)
-
-                // Push it onto the errorStack
-                errContext.addNewError(rawModErr)
-
-                // Return 1
-                resolve(1)
-              }
-            })
           })
         })
       }
