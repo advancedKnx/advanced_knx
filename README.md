@@ -1,4 +1,4 @@
-## ATTENTION
+## ATTENTION: THIS VERSION OF ADVANCED_KNX HAS NO DOCUMENTATION
 * Please note that this is NOT the original knx.js repository!
 * It is a fork for another project adding some features like the base for an BusMonitor
   or the ability to send self constructed messages. (...)
