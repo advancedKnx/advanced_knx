@@ -43,7 +43,14 @@ function IpRoutingConnection (instance) {
   /// </summary>
   instance.Connect = function () {
     let sm = this
+
     this.localAddress = this.getLocalAddress()
+
+    if (!this.localAddress) {
+      return Error('Unable to get local address!')
+    } else if (this.localAddress.constructor === Error) {
+      return this.localAddress
+    }
 
     this.socket = this.BindSocket(function (socket) {
       socket.on('error', function (errmsg) {

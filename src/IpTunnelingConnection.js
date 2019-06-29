@@ -25,7 +25,15 @@ function IpTunnelingConnection (instance, options) {
 
   instance.Connect = function () {
     let sm = this
+
+    // Check the return value
     this.localAddress = this.getLocalAddress()
+
+    if (!this.localAddress) {
+      return Error('Unable to get local address!')
+    } else if (this.localAddress.constructor === Error) {
+      return this.localAddress
+    }
 
     // create the socket
     this.socket = this.BindSocket(function (socket) {
