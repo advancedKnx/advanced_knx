@@ -131,7 +131,7 @@ export default class KnxNetProtocol {
     switch (serviceType) {
       case KnxConstants.SERVICE_TYPE.TUNNELING_REQUEST:
         KnxNetProtocol.addTunn(datagram, conContext.localAddress, conContext.localPort)
-        KnxNetProtocol.addTunnState(datagram, conContext.channel_id, conContext.channel_id, seqnum)
+        KnxNetProtocol.addTunnState(datagram, conContext.channel_id, conContext.remoteEndpoint, seqnum)
         KnxNetProtocol.addCemi(datagram, cemi)
         break
       case KnxConstants.SERVICE_TYPE.TUNNELING_ACK:
@@ -156,6 +156,12 @@ export default class KnxNetProtocol {
    *      callback    This function will be called when the request was sent
    */
   static sendTunnRequest (cemi, conContext, callback) {
+    // Check if cemi is present
+    if (!cemi) {
+      callback(Error('Can not send a message with cemi eq. null!'))
+      return
+    }
+
     const finalCemi = {
       // Default msgCode: KnxConstants.MESSAGECODES["L_Data.req"] == 0x11
       msgCode: (cemi.msgCode != null) ? cemi.msgCode : 0x11,
