@@ -191,6 +191,12 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
     elementCount: 0x01,
     startIndex: 0x01
   },
+  ManufacturerID: {
+    objectIndex: 0x00,
+    propertyID: 0x0c,
+    elementCount: 0x01,
+    startIndex: 0x01
+  },
   OrderNumber: {
     objectIndex: 0x00,
     propertyID: 0x0f,
@@ -209,6 +215,12 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
     elementCount: 0x01,
     startIndex: 0x01
   },
+  Application_1_LoadState: {
+    objectIndex: 0x03,
+    propertyID: 0x05,
+    elementCount: 0x01,
+    startIndex: 0x01
+  },
   Application_2_ID: {
     objectIndex: 0x04,
     propertyID: 0x0d,
@@ -220,7 +232,21 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
     propertyID: 0x06,
     elementCount: 0x01,
     startIndex: 0x01
-  }
+  },
+  Application_2_LoadState: {
+    objectIndex: 0x04,
+    propertyID: 0x05,
+    elementCount: 0x01,
+    startIndex: 0x01
+  },
+}
+
+// Different KNX device application runstates
+KnxConstants.KNX_DEV_APLLICATION_RUNSTATES = {
+  ApplicationOffline: 0x00,
+  ApplicationOnline: 0x01,
+  ApplicationReady: 0x02,
+  ApplicationDisabled: 0x3
 }
 
 // The broadcast group address on every KNX bus
