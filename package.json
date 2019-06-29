@@ -1,8 +1,8 @@
 {
   "name": "advanced_knx",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "main": "src/index.js",
-  "author": "Elias Karakoulakis <Elias.Karakoulakis@gmail.com>",
+  "author": "Noname <knx_code@protonmail.com>",
   "private": false,
   "license": "MIT",
   "homepage": "https://github.com/advancedKnx/advanced_knx.git",
@@ -14,7 +14,7 @@
     "url": "https://github.com/advancedKnx/advanced_knx/issues"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=8"
   },
   "scripts": {
     "build": "babel src -d dist",
