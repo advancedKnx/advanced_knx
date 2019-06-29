@@ -24,6 +24,7 @@ const AUTO_RECONNECT_DEFAULT = true // Enables/Disables automatic reconnection
 const DEFAULT_RECEIVE_ACK_TIMEOUT = 2000 // How long to wait for a acknowledge message from the KNX-IP interface (ms)
 const DEFAULT_MINIMUM_DELAY = 20 // How long to wait after sending a message to send the next one
 const DEFAULT_CONNSTATE_REQUEST_INTERVAL = 10000 // Request the connection state from the KNX-IP interface every 10 seconds by default
+const DEFAULT_CONNSTATE_RESPONSE_TIMEOUT = 1500 // Wait 1.5 seconds for a connection state response before declaring a connecting lost by default
 
 const states = {
   uninitialized: {
@@ -138,6 +139,9 @@ const states = {
       } else {
         // store channel ID into the Connection object
         this.channel_id = datagram.connstate.channel_id
+
+        // Clear timeout for connection state requests to prevent it from sending requests with old eq. invalid data
+        clearInterval(this.idletimer)
 
         // set the global knx address
         this.options.physAddr = Address.toString(Buffer.from([datagram.cri.knx_layer, datagram.cri.unused]))
@@ -351,7 +355,7 @@ const states = {
         KnxLog.get().trace('(%s): %s', sm.compositeState(), msg)
         sm.transition('connecting')
         sm.emit('error', msg)
-      }, 1000)
+      }, this.options.connstateResponseTimeout || DEFAULT_CONNSTATE_RESPONSE_TIMEOUT)
     },
     _onExit: function () {
       clearTimeout(this.connstatetimer)
