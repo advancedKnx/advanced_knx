@@ -179,13 +179,8 @@ export default {
 
       // This function prepares the custom message handler templates
       const prepareCustomMessageHandlerTemplates = () => {
-        ncdAckHandlerTemplate = RawModCustomMsgHandlerTemplates.ncdAckHandlerTemplate
-        ncdNackHandlerTemplate = RawModCustomMsgHandlerTemplates.ncdNackHandlerTemplate
-
-        ncdAckHandlerTemplate.cemi.src_addr = target
-        ncdAckHandlerTemplate.cemi.dest_addr = source || conContext.options.physAddr
-        ncdNackHandlerTemplate.cemi.src_addr = target
-        ncdNackHandlerTemplate.cemi.dest_addr = source || conContext.options.physAddr
+        ncdAckHandlerTemplate = RawModCustomMsgHandlerTemplates.ncdAckHandlerTemplate(target, source || conContext.options.physAddr)
+        ncdNackHandlerTemplate = RawModCustomMsgHandlerTemplates.ncdNackHandlerTemplate(target, source || conContext.options.physAddr)
       }
 
       // A handler for the acknowledge message (Contains the 'everything-went-right' exit point)

@@ -201,10 +201,7 @@ export default {
 
       // This function prepares the custom message handler templates
       const prepareCustomMessageHandlerTemplates = () => {
-        memoryResponseHandlerTemplate = RawModCustomMsgHandlerTemplates.memoryResponseTemplate
-
-        memoryResponseHandlerTemplate.cemi.src_addr = target
-        memoryResponseHandlerTemplate.cemi.dest_addr = source || conContext.options.physAddr
+        memoryResponseHandlerTemplate = RawModCustomMsgHandlerTemplates.memoryResponseTemplate(target, source || conContext.options.physAddr)
       }
 
       // A handler for the MemoryResponse (Contains the 'everything-went-right' exit point)

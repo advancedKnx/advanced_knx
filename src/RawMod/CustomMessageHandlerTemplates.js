@@ -10,30 +10,36 @@ import KnxConstants from '../KnxConstants'
  */
 
 const CustomMessageHandlerTemplates = {
-  ncdNackHandlerTemplate: {
-    cemi: {
-      src_addr: '0.0.0',
-      dest_addr: '0.0.0',
-      apdu: {
-        tpci: KnxConstants.KNX_TPCI_TYPES.TPCI_NCD | KnxConstants.KNX_TPCI_SUBTYPES.TPCI_NCD_NACK
+  ncdNackHandlerTemplate: (sender, receiver) => {
+    return {
+      cemi: {
+        src_addr: sender,
+        dest_addr: receiver,
+        apdu: {
+          tpci: KnxConstants.KNX_TPCI_TYPES.TPCI_NCD | KnxConstants.KNX_TPCI_SUBTYPES.TPCI_NCD_NACK
+        }
       }
     }
   },
-  ncdAckHandlerTemplate: {
-    cemi: {
-      src_addr: '0.0.0',
-      dest_addr: '0.0.0',
-      apdu: {
-        tpci: KnxConstants.KNX_TPCI_TYPES.TPCI_NCD | KnxConstants.KNX_TPCI_SUBTYPES.TPCI_NCD_ACK
+  ncdAckHandlerTemplate: (sender, receiver) => {
+    return {
+      cemi: {
+        src_addr: sender,
+        dest_addr: receiver,
+        apdu: {
+          tpci: KnxConstants.KNX_TPCI_TYPES.TPCI_NCD | KnxConstants.KNX_TPCI_SUBTYPES.TPCI_NCD_ACK
+        }
       }
     }
   },
-  memoryResponseTemplate: {
-    cemi: {
-      src_addr: '0.0.0',
-      dest_addr: '0.0.0',
-      apdu: {
-        apci: 'Memory_Response'
+  memoryResponseTemplate: (sender, receiver) => {
+    return {
+      cemi: {
+        src_addr: sender,
+        dest_addr: receiver,
+        apdu: {
+          apci: 'Memory_Response'
+        }
       }
     }
   },
