@@ -8,11 +8,10 @@ Error.stackTraceLimit = Infinity
 const knx = require('../src/index')
 const test = require('tape')
 
-//
 test('KNX connect routing', function (t) {
-  var connection = knx.Connection({
+  knx.Connection({
     loglevel: 'trace',
-    ipAddr: '192.168.1.102',
+    ipAddr: '224.0.23.12',
     ipPort: 3671,
     handlers: {
       connected: function () {
@@ -35,4 +34,4 @@ test('KNX connect routing', function (t) {
 setTimeout(function () {
   console.log('Exiting with timeout...')
   process.exit(2)
-}, 1000)
+}, 4000)
