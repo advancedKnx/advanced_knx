@@ -10,7 +10,7 @@ import RawModCustomMsgHandlerTemplates from './CustomMessageHandlerTemplates'
 import KnxAddress from './KnxAddress'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxWriteDevMem {
+export default {
   /*
    * Function: KnxWriteDevMem.writeDevMem()
    *
@@ -63,7 +63,7 @@ export default class KnxWriteDevMem {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async writeDevMem (target, source, address, data, recvTimeout, conContext, errContext) {
+  writeDevMem: async (target, source, address, data, recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      Send a UCD connection request to the target device
@@ -73,7 +73,7 @@ export default class KnxWriteDevMem {
      *      Send a UCD disconnect request
      */
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       // Create a empty vars
       let err
       let rawModErr
@@ -118,7 +118,7 @@ export default class KnxWriteDevMem {
           }
         }
 
-        // This function checks the data argument (data.length > 12 && < 1)
+        // This function checks the data argument (data.length <= 12 && >= 1)
         const checkDataVal = () => {
           if ((data.length > 12) || data.length < 1) {
             err = new Error(RawModErrors.ERR_WriteDevMem.INVALID_DATALEN.errorMsg)

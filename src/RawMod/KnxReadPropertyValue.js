@@ -10,7 +10,7 @@ import RawModCustomMsgHandlerTemplates from './CustomMessageHandlerTemplates'
 import KnxAddress from './KnxAddress'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxReadPropertyValue {
+export default {
   /*
    * Function: KnxReadDevMem.readPropertyValue()
    *
@@ -92,11 +92,11 @@ export default class KnxReadPropertyValue {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async readPropertyValue (target, source, objectIndex, startIndex, propertyID, elementCount, recvTimeout, conContext, errContext) {
+  readPropertyValue: async (target, source, objectIndex, startIndex, propertyID, elementCount, recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      Send a UCD connection request to the target device
-     *      Send a memory read request to read n=length bytes from the targets memory@address
+     *      Send a property value read request
      *      (The device should send the requested data, wait for it)
      *      Send a NCD acknowledge message back to the device
      *      Send a UCD disconnect request
@@ -188,7 +188,8 @@ export default class KnxReadPropertyValue {
       // This function forges all the needed messages
       const forgeMessages = () => {
         connReq = KnxMessageTemplates.ucdConnRequest(target, source)
-        propValReadReq = KnxMessageTemplates.propertyValueReadRequest(target, objectIndex, propertyID, elementCount, startIndex)
+        propValReadReq = KnxMessageTemplates.propertyValueReadRequest(target, source,
+          objectIndex, propertyID, elementCount, startIndex)
         ackMsg = KnxMessageTemplates.ncdAckMsg(target, source)
         dconnMsg = KnxMessageTemplates.ucdDconnMsg(target, source)
       }

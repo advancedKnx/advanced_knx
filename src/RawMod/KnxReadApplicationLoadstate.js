@@ -2,11 +2,11 @@
  * This file contains a function to read the application loadstate of an KNX device *
  ************************************************************************************/
 
-import KnxReadDevMem from './KnxReadDevMem'
 import KnxConstants from '../KnxConstants'
 import RawModErrors from './Errors'
+import KnxReadPropertyValue from './KnxReadPropertyValue'
 
-export default class KnxReadApplicationRunstate {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.readApplicationLoadstate()
    *
@@ -68,15 +68,15 @@ export default class KnxReadApplicationRunstate {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async readApplicationLoadstate (target, applicationIndex, recvTimeout, conContext, errContext) {
+  readApplicationLoadstate: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
-      // Get the correct address
-      let addr
+      // Get the correct objectIndex
+      let objectIndex
 
       if (applicationIndex === 1) {
-        addr = KnxConstants.KNX_MEMORY_ADDRS.MEMORY_LOADSTATE_APP1_ADDR
+        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.objectIndex
       } else if (applicationIndex === 2) {
-        addr = KnxConstants.KNX_MEMORY_ADDRS.MEMORY_LOADSTATE_APP2_ADDR
+        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_2_LoadState.objectIndex
       } else {
         const err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL.errorMsg)
         const rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL)
@@ -89,13 +89,19 @@ export default class KnxReadApplicationRunstate {
       }
 
       /*
-       * Pass the request to KnxReadDevMem().readDevMem()
+       * Pass the request to KnxReadPropertyValue.readPropertyValue()
+       * (Values for Application 1 can be used - eq. for Application 2)
        */
-      let val = await new KnxReadDevMem().readDevMem(target, conContext.options.physAddr, addr, 1, recvTimeout, conContext, errContext)
+      let val = await KnxReadPropertyValue.readPropertyValue(target, conContext.options.physAddr,
+        objectIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.startIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.propertyID,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.elementCount,
+        recvTimeout, conContext, errContext)
 
       if (!val.error) {
         // Cut of the first four bytes
-        val.data = val.data.slice(2)
+        val.data = val.data.slice(4)
       }
 
       // Return the result

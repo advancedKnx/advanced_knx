@@ -5,7 +5,7 @@
 import KnxReadPropertyValue from './KnxReadPropertyValue'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxReadOrderNumber {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.readOrderNumber()
    *
@@ -60,7 +60,7 @@ export default class KnxReadOrderNumber {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async readOrderNumber (target, recvTimeout, conContext, errContext) {
+  readOrderNumber: async (target, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       /*
        * Pass the request to KnxReadPropertyValue.readPropertyValue()

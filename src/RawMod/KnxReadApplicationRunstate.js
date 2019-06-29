@@ -6,7 +6,7 @@ import KnxReadPropertyValue from './KnxReadPropertyValue'
 import KnxConstants from '../KnxConstants'
 import RawModErrors from './Errors'
 
-export default class KnxReadApplicationRunstate {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.readApplicationRunstate()
    *
@@ -68,7 +68,7 @@ export default class KnxReadApplicationRunstate {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async readApplicationRunstate (target, applicationIndex, recvTimeout, conContext, errContext) {
+  readApplicationRunstate: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       // Get the correct objectIndex
       let objectIndex

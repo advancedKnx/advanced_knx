@@ -5,7 +5,7 @@
 import KnxReadDevMem from './KnxReadDevMem'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxGetProgmodeStatus {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.getProgmodeStatus()
    *
@@ -55,7 +55,7 @@ export default class KnxGetProgmodeStatus {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async getProgmodeStatus (target, recvTimeout, conContext, errContext) {
+  getProgmodeStatus: async (target, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       let retVal = {
         data: null,
@@ -68,7 +68,7 @@ export default class KnxGetProgmodeStatus {
        *      address ([0x00, 0x60] == KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR) is the address of the position of the programming-mode flags on all KXN-devices
        *      length (1) is the amount of bytes to read from the address
        */
-      let val = await new KnxReadDevMem().readDevMem(target, conContext.options.physAddr, KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR, 1, recvTimeout, conContext, errContext)
+      let val = await KnxReadDevMem.readDevMem(target, conContext.options.physAddr, KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR, 1, recvTimeout, conContext, errContext)
 
       // Copy the data into 'retVal' and cut off the first two bytes - the memory address
       if (!(retVal.error = val.error)) {

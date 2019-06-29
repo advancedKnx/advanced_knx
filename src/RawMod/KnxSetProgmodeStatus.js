@@ -5,7 +5,7 @@
 import KnxWriteDevMem from './KnxWriteDevMem'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxGetProgmodeStatus {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.setProgmodeStatus()
    *
@@ -50,18 +50,13 @@ export default class KnxGetProgmodeStatus {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async setProgmodeStatus (target, status, recvTimeout, conContext, errContext) {
-    return new Promise(async resolve => {
-      /*
-       * Pass the request to KnxWriteDevmem.writeDevMem()
-       *      source (conContext.options.phsyAddr) is the KNX-device address of the KNX-IP interface
-       *      address ([0x00, 0x60] == KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR) is the address of the position of the programming-mode flags on all KXN-devices
-       */
-      let val = await KnxWriteDevMem.writeDevMem(target, conContext.options.physAddr, KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR,
-        Buffer.from([status]), recvTimeout, conContext, errContext)
-
-      // Return the result
-      resolve(val)
-    })
+  setProgmodeStatus: async (target, status, recvTimeout, conContext, errContext) => {
+    /*
+     * Pass the request to KnxWriteDevmem.writeDevMem()
+     *      source (conContext.options.phsyAddr) is the KNX-device address of the KNX-IP interface
+     *      address ([0x00, 0x60] == KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR) is the address of the position of the programming-mode flags on all KXN-devices
+     */
+    return KnxWriteDevMem.writeDevMem(target, conContext.options.physAddr, KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR,
+      Buffer.from([status]), recvTimeout, conContext, errContext)
   }
 }

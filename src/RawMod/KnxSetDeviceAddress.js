@@ -7,7 +7,7 @@ import KnxMessageTemplates from './KnxMessageTemplates'
 import KnxNetProtocol from './KnxNetProtocol'
 import KnxAddress from './KnxAddress'
 
-export default class KnxSetDeviceAddress {
+export default {
   /*
    * Function: KnxSetDeviceAddress.setDeviceAddress()
    *
@@ -40,7 +40,7 @@ export default class KnxSetDeviceAddress {
    *
    *      There may be other errors not labeled by RawMod (thrown by the socket API when sending messages)
    */
-  static async setDeviceAddress (newAddr, conContext, errContext) {
+  setDeviceAddress: async (newAddr, conContext, errContext) => {
     /*
      * The process works like following:
      *      ** Assume that the target device is in programming mode **

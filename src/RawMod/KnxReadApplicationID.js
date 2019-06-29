@@ -6,7 +6,7 @@ import KnxReadPropertyValue from './KnxReadPropertyValue'
 import KnxConstants from '../KnxConstants'
 import RawModErrors from './Errors'
 
-export default class KnxReadApplicationID {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.readApplicationID()
    *
@@ -68,7 +68,7 @@ export default class KnxReadApplicationID {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async readApplicationID (target, applicationIndex, recvTimeout, conContext, errContext) {
+  readApplicationID: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       // Get the correct objectIndex
       let objectIndex

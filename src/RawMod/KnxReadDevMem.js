@@ -10,7 +10,7 @@ import RawModCustomMsgHandlers from './CustomMsgHandlers'
 import RawModCustomMsgHandlerTemplates from './CustomMessageHandlerTemplates'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxReadDevMem {
+export default {
   /*
    * Function: KnxReadDevMem.readDevMem()
    *
@@ -86,7 +86,7 @@ export default class KnxReadDevMem {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  async readDevMem (target, source, address, length, recvTimeout, conContext, errContext) {
+  readDevMem: async (target, source, address, length, recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      Send a UCD connection request to the target device

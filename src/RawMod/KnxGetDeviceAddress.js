@@ -8,7 +8,7 @@ import KnxNetProtocol from './KnxNetProtocol'
 import RawModCustomMsgHandlers from './CustomMsgHandlers'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxGetDeviceAddress {
+export default {
   /*
    * Function: KnxGetDeviceAddress.getDeviceAddress()
    *
@@ -56,7 +56,7 @@ export default class KnxGetDeviceAddress {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async getDeviceAddress (recvTimeout, conContext, errContext) {
+  getDeviceAddress: async (recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      ** Assume that the target device is in programming mode **

@@ -5,7 +5,7 @@
 import KnxReadDevMem from './KnxReadDevMem'
 import KnxConstants from '../KnxConstants'
 
-export default class KnxReadGroupAssociationTblLoadstate {
+export default {
   /*
    * Function: KnxGetProgmodeStatus.readGroupAssociationTblLoadState()
    *
@@ -61,12 +61,12 @@ export default class KnxReadGroupAssociationTblLoadstate {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  static async readGroupAssociationTblLoadState (target, recvTimeout, conContext, errContext) {
+  readGroupAssociationTblLoadState: async (target, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       /*
        * Pass the request to KnxReadDevMem().readDevMem()
        */
-      let val = await new KnxReadDevMem().readDevMem(target, conContext.options.physAddr,
+      let val = await KnxReadDevMem.readDevMem(target, conContext.options.physAddr,
         KnxConstants.KNX_MEMORY_ADDRS.MEMORY_GROUP_ASSOCIATION_TBL_LOADSTATE_ADDR, 1, recvTimeout,
         conContext, errContext)
 
