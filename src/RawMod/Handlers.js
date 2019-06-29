@@ -3,9 +3,10 @@
  ************************************************/
 
 import KnxConstants from '../KnxConstants'
-import KnxNetRebuildMessageBytes from './KnxNetRebuildMessageBytes'
 import CustomMsgHandlers from './CustomMsgHandlers'
-import KnxNetProtocolExtra from './KnxNetProtocolExtra'
+import _KnxNetProtocolExtra from './KnxNetProtocolExtra'
+
+const KnxNetProtocolExtra = new _KnxNetProtocolExtra()
 
 export default class RawModHandlers {
   /*
@@ -37,7 +38,7 @@ export default class RawModHandlers {
           /*
            * Construct the raw bus message and pass it on along with rawMsgJson
            */
-          conContext.handlers.rawMsgCb(KnxNetRebuildMessageBytes.rebuildMessageBytes(rawMsg), rawMsgJson)
+          conContext.handlers.rawMsgCb(KnxNetProtocolExtra.rebuildMessageBytes(rawMsg), rawMsgJson)
         }
       }
     }
@@ -62,7 +63,7 @@ export default class RawModHandlers {
     /*
      * Extract the sequence number from the broken message and send a acknowledge message
      */
-    new KnxNetProtocolExtra().sendAck(new KnxNetProtocolExtra().msgGetSeqnum(rawMsg), conContext)
+    KnxNetProtocolExtra.sendAck(KnxNetProtocolExtra.msgGetSeqnum(rawMsg), conContext)
   }
 
   /*
