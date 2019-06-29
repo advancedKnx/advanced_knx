@@ -136,6 +136,38 @@ const RawModErrors = {
       errorID: 0x45 + (0x1 << 16), // 65605
       errorMsg: ErrorMessages.INVALID_SOURCE
     }
+  },
+
+  // Errors for KnxWritePropertyValue.writePropertyValue()
+  ERR_WritePropertyValue: {
+    UNDEF_ARGS: {
+      errorID: 0x50 + (0x1 << 16), // 65616
+      errorMsg: ErrorMessages.UNDEF_ARGS
+    },
+    INVALID_ARGTYPES: {
+      errorID: 0x51 + (0x1 << 16), // 65617
+      errorMsg: ErrorMessages.INVALID_ARGTYPES
+    },
+    INVALID_DATALEN: {
+      errorID: 0x52 + (0x1 << 16), // 65618
+      errorMsg: ErrorMessages.INVALID_DATALEN
+    },
+    TARGET_NOTACK: {
+      errorID: 0x53 + (0x1 << 16), // 65619
+      errorMsg: ErrorMessages.TARGET_NOTACK
+    },
+    TIMEOUT_REACHED: {
+      errorID: 0x54 + (0x1 << 16), // 65620
+      errorMsg: ErrorMessages.TIMEOUT_REACHED
+    },
+    INVALID_TARGET: {
+      errorID: 0x55 + (0x1 << 16), // 65621
+      errorMsg: ErrorMessages.INVALID_TARGET
+    },
+    INVALID_SOURCE: {
+      errorID: 0x56 + (0x1 << 16), // 65622
+      errorMsg: ErrorMessages.INVALID_SOURCE
+    }
   }
 }
 
