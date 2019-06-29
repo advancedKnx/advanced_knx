@@ -384,6 +384,7 @@ const Connection = function (options) {
 
   // boot up the KNX connection unless told otherwise
   if (!options.manualConnect) conn.Connect()
+
   return (conn)
 }
 
