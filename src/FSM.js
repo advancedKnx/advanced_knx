@@ -23,10 +23,15 @@ const RECONNECT_DELAY_DEFAULT = 3000 // Delay between reconnection attempts (ms)
 const AUTO_RECONNECT_DEFAULT = true // Enables/Disables automatic reconnection
 const DEFAULT_RECEIVE_ACK_TIMEOUT = 2000 // How long to wait for a acknowledge message from the KNX-IP interface (ms)
 const DEFAULT_MINIMUM_DELAY = 20 // How long to wait after sending a message to send the next one
+const DEFAULT_CONNSTATE_REQUEST_INTERVAL = 10000 // Request the connection state from the KNX-IP interface every 10 seconds by default
 
 const states = {
   uninitialized: {
     '*': function () {
+      // Set this.isConnected
+      this.isConnected = false
+
+      // try to connect
       this.transition('connecting')
     }
   },
@@ -49,6 +54,7 @@ const states = {
       // tell listeners that we disconnected
       // putting this here will result in a correct state for our listeners
       this.emit('disconnected')
+
       let sm = this
       this.log.debug(util.format('useTunneling=%j', this.useTunneling))
       if (this.useTunneling) {
@@ -132,7 +138,7 @@ const states = {
         this.options.physAddr = Address.toString(Buffer.from([datagram.cri.knx_layer, datagram.cri.unused]))
 
         // send connectionstate request directly
-        this.send(this.prepareDatagram(KnxConstants.SERVICE_TYPE.CONNECTIONSTATE_REQUEST), function (err) {
+        this.send(this.prepareDatagram(KnxConstants.SERVICE_TYPE.CONNECTIONSTATE_REQUEST), err => {
           /*
            * Call RawModHandlers.sendFailHandler() when sending a message failed
            */
@@ -160,8 +166,13 @@ const states = {
     _onEnter: function () {
       // Reset connection reattempts cycle counter for next disconnect
       this.reconnection_cycles = 0
+
       // Reset outgoing sequence counter..
       this.seqnum = -1
+
+      // Set this.isConnected
+      this.isConnected = true
+
       /* important note: the sequence counter is SEPARATE for incoming and
         outgoing datagrams. We only keep track of the OUTGOING L_Data.req
         and we simply acknowledge the incoming datagrams with their own seqnum */
@@ -184,7 +195,7 @@ const states = {
           sm.emit('disconnected')
         }, 3000)
         //
-        this.send(this.prepareDatagram(KnxConstants.SERVICE_TYPE.DISCONNECT_REQUEST), function (err) {
+        this.send(this.prepareDatagram(KnxConstants.SERVICE_TYPE.DISCONNECT_REQUEST), err => {
           /*
            * Call RawModHandlers.sendFailHandler() when sending a message failed
            */
@@ -214,7 +225,7 @@ const states = {
         this.idletimer = setTimeout(function () {
           // time out on inactivity...
           this.transition('requestingConnState')
-        }.bind(this), 10000)
+        }.bind(this), this.options.connstateRequestInterval || DEFAULT_CONNSTATE_REQUEST_INTERVAL)
       }
       // debuglog the current FSM state plus a custom message
       KnxLog.get().debug('(%s):\t%s', this.compositeState(), ' zzzz...')
@@ -318,7 +329,7 @@ const states = {
     _onEnter: function () {
       let sm = this
       KnxLog.get().trace('(%s): Requesting Connection State', this.compositeState())
-      this.send(this.prepareDatagram(KnxConstants.SERVICE_TYPE.CONNECTIONSTATE_REQUEST), function (err) {
+      this.send(this.prepareDatagram(KnxConstants.SERVICE_TYPE.CONNECTIONSTATE_REQUEST), err => {
         /*
          * Call RawModHandlers.sendFailHandler() when sending a message failed
          */
@@ -419,7 +430,7 @@ const states = {
       this.waitingForAck = true
 
       // this.log.debug('setting up tunnreq timeout for %j', datagram);
-      this.tunnelingAckTimer = setTimeout(function () {
+      this.tunnelingAckTimer = setTimeout(() => {
         /*
          * Call RawModHandlers.waitAckTimeoutHandler() when a timeout is reached while waiting for a acknowledge message
          */
@@ -427,7 +438,7 @@ const states = {
 
         sm.transition('idle')
         sm.emit('tunnelreqfailed', datagram)
-      }.bind(this), this.options.receiveAckTimeout || DEFAULT_RECEIVE_ACK_TIMEOUT)
+      }, this.options.receiveAckTimeout || DEFAULT_RECEIVE_ACK_TIMEOUT)
     },
     _onExit: function () {
       // Signalize that the awaited acknowledge message was received and clear the timeout
@@ -468,6 +479,7 @@ const initialize = function (options) {
   this.ThreeLevelGroupAddressing = true
   this.reconnection_cycles = 0
   this.sentTunnRequests = {}
+  this.isConnected = false
   this.useTunneling = options.forceTunneling || false
   this.remoteEndpoint = {
     addrstring: options.ipAddr,
@@ -496,7 +508,7 @@ const acknowledge = function (datagram) {
 
   // copy the sequence number and acknowledge
   ack.tunnstate.seqnum = datagram.tunnstate.seqnum
-  this.send(ack, function (err) {
+  this.send(ack, err => {
     /*
      * Call RawModHandlers.sendFailHandler() when sending a message failed
      */
@@ -506,16 +518,20 @@ const acknowledge = function (datagram) {
   })
 }
 const emitEvent = function (datagram) {
-  // emit events to our beloved subscribers in a multitude of targets - ORDER IS IMPORTANT!
+  // emit events in a multitude of targets - ORDER IS IMPORTANT!
   let evtName = datagram.cemi.apdu.apci
+
   // 1. 'event_<dest_addr>', ''GroupValue_Write', src, data
   this.emit(util.format('event_%s', datagram.cemi.dest_addr),
     evtName, datagram.cemi.src_addr, datagram.cemi.apdu.data)
+
   // 2. 'GroupValue_Write_1/2/3', src, data
   this.emit(util.format('%s_%s', evtName, datagram.cemi.dest_addr),
     datagram.cemi.src_addr, datagram.cemi.apdu.data)
+
   // 3. 'GroupValue_Write', src, dest, data
   this.emit(evtName, datagram.cemi.src_addr, datagram.cemi.dest_addr, datagram.cemi.apdu.data)
+
   // 4. 'event', 'GroupValue_Write', src, dest, data
   this.emit('event', evtName, datagram.cemi.src_addr, datagram.cemi.dest_addr, datagram.cemi.apdu.data)
 }
@@ -542,7 +558,7 @@ const getLocalAddress = function () {
   // if user has declared a desired interface then use it
   if (this.options && this.options.interface) {
     if (!candidateInterfaces.hasOwnProperty(this.options.interface)) {
-      throw Error('Interface ' + this.options.interface + ' not found or has no useful IPv4 address!')
+      return Error('Interface ' + this.options.interface + ' not found or has no useful IPv4 address!')
     } else {
       return candidateInterfaces[this.options.interface].address
     }
