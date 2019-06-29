@@ -134,14 +134,28 @@ const KnxMessageTemplates = {
     return retVal
   },
 
-  // This function can be used to craft a system ID read request - broadcast
-  propertyValueReadRequest: (target, objectIndex, propertyID, elementCount, startIndex) => {
+  // This function can be used to craft a property value read request
+  propertyValueReadRequest: (destAddr, srcAddr, objectIndex, propertyID, elementCount, startIndex) => {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
 
-    retVal.dest_addr = target
+    retVal.src_addr = srcAddr
+    retVal.dest_addr = destAddr
     retVal.apdu.apci = 'PropertyValue_Read'
     retVal.apdu.tpci = KnxConstants.KNX_TPCI_TYPES.TPCI_NDP >> 2
     retVal.apdu.data = Buffer.from([objectIndex, propertyID, ((elementCount & 0b1111) << 4) | (startIndex >> 8) & 0b1111, startIndex & 0b11111111])
+
+    return retVal
+  },
+
+  // This funciton can be used to craft a property value write request
+  propertyValueWriteRequest: (destAddr, srcAddr, objectIndex, propertyID, elementCount, startIndex, data) => {
+    const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
+
+    retVal.src_addr = srcAddr
+    retVal.dest_addr = destAddr
+    retVal.apdu.apci = 'PropertyValue_Write'
+    retVal.apdu.tpci = KnxConstants.KNX_TPCI_TYPES.TPCI_NDP >> 2
+    retVal.apdu.data = Buffer.from([objectIndex, propertyID, ((elementCount & 0b1111) << 4) | (startIndex >> 8) & 0b1111, startIndex & 0b11111111].concat(Array.from(data)))
 
     return retVal
   }
