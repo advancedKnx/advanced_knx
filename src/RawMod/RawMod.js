@@ -10,6 +10,7 @@ import KnxConstants from '../KnxConstants'
 import KnxReadDevMem from './KnxReadDevMem'
 import KnxWriteDevMem from './KnxWriteDevMem'
 import KnxReadPropertyValue from './KnxReadPropertyValue'
+import KnxWritePropertyValue from './KnxWritePropertyValue'
 import KnxGetDeviceAddress from './KnxGetDeviceAddress'
 import KnxSetDeviceAddress from './KnxSetDeviceAddress'
 import KnxGetProgmodeStatus from './KnxGetProgmodeStatus'
@@ -21,6 +22,7 @@ import KnxReadApplicationRunstate from './KnxReadApplicationRunstate'
 import KnxReadApplicationLoadstate from './KnxReadApplicationLoadstate'
 import KnxReadGroupAddrTblLoadstate from './KnxReadGroupAddrTblLoadstate'
 import KnxReadGroupAssociationTblLoadstate from './KnxReadGroupAssociationTblLoadstate'
+import KnxReadManufacturerID from './KnxReadManufacturerID'
 
 // The RawMod class - providing useful definitions and functions
 export default class RawMod {
@@ -47,9 +49,10 @@ export default class RawMod {
     this.KnxAddress = KnxAddress
 
     // More advanced KNX functions
-    this.KnxReadDevMem = new KnxReadDevMem()
-    this.KnxWriteDevMem = new KnxWriteDevMem()
+    this.KnxReadDevMem = KnxReadDevMem
+    this.KnxWriteDevMem = KnxWriteDevMem
     this.KnxReadPropertyValue = KnxReadPropertyValue
+    this.KnxWritePropertyValue = KnxWritePropertyValue
 
     // These are top-level function that should be used normally
     this.KnxGetProgmodeStatus = KnxGetProgmodeStatus
@@ -63,5 +66,6 @@ export default class RawMod {
     this.KnxReadApplicationLoadstate = KnxReadApplicationLoadstate
     this.KnxReadGroupAddrTblLoadState = KnxReadGroupAddrTblLoadstate
     this.KnxReadGroupAssociationTblLoadState = KnxReadGroupAssociationTblLoadstate
+    this.KnxReadManufacturerID = KnxReadManufacturerID
   }
 }
