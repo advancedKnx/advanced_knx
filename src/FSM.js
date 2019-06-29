@@ -49,7 +49,12 @@ const states = {
        * And check if autoReconnect was specified
        */
       let reconnectDelay = this.options.reconnectDelayMs / 2 || RECONNECT_DELAY_DEFAULT / 2
-      let autoReconnect = this.options.autoReconnect || AUTO_RECONNECT_DEFAULT
+      let autoReconnect = this.options.hasOwnProperty('autoReconnect') ? this.options.autoReconnect : AUTO_RECONNECT_DEFAULT
+
+      // Check if the user called to disconnect
+      if (this.disconnectCalled) {
+        autoReconnect = false
+      }
 
       // tell listeners that we disconnected
       // putting this here will result in a correct state for our listeners
@@ -185,6 +190,9 @@ const states = {
   disconnecting: {
     _onEnter: function () {
       if (this.useTunneling) {
+        // Set this.disconnectCalled
+        this.disconnectCalled = true
+
         const sm = this
         const aliveFor = this.conntime ? Date.now() - this.conntime : 0
         KnxLog.get().debug('(%s):\tconnection alive for %d seconds', this.compositeState(), aliveFor / 1000)
@@ -479,6 +487,7 @@ const initialize = function (options) {
   this.ThreeLevelGroupAddressing = true
   this.reconnection_cycles = 0
   this.sentTunnRequests = {}
+  this.disconnectCalled = false
   this.isConnected = false
   this.useTunneling = options.forceTunneling || false
   this.remoteEndpoint = {
