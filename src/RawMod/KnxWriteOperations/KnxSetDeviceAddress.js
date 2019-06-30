@@ -2,10 +2,10 @@
  * This file contains a function to write the device address of an KNX device *
  ******************************************************************************/
 
-import RawModErrors from './Errors'
-import KnxMessageTemplates from './KnxMessageTemplates'
-import KnxNetProtocol from './KnxNetProtocol'
-import KnxAddress from './KnxAddress'
+import RawModErrors from '../Errors'
+import KnxMessageTemplates from '../KnxMessageTemplates'
+import KnxNetProtocol from '../KnxNetProtocol'
+import KnxAddress from '../KnxAddress'
 
 export default {
   /*

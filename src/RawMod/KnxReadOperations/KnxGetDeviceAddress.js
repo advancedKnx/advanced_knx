@@ -2,11 +2,11 @@
  * This file contains a function to read the device address of an KNX device *
  *****************************************************************************/
 
-import RawModErrors from './Errors'
-import KnxMessageTemplates from './KnxMessageTemplates'
-import KnxNetProtocol from './KnxNetProtocol'
-import RawModCustomMsgHandlers from './CustomMsgHandlers'
-import KnxConstants from '../KnxConstants'
+import RawModErrors from '../Errors'
+import KnxMessageTemplates from '../KnxMessageTemplates'
+import KnxNetProtocol from '../KnxNetProtocol'
+import RawModCustomMsgHandlers from '../CustomMsgHandlers'
+import KnxConstants from '../../KnxConstants'
 
 export default {
   /*

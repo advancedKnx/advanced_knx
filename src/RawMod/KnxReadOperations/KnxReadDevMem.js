@@ -1,20 +1,20 @@
-/********************************************************************
- * This file contains a function to read KNX device property values *
- ********************************************************************/
+/***********************************************************
+ * This file contains a function to read KNX device memory *
+ ***********************************************************/
 
-import KnxMessageTemplates from './KnxMessageTemplates'
-import KnxNetProtocol from './KnxNetProtocol'
-import RawModErrors from './Errors'
-import RawModCustomMsgHandlers from './CustomMsgHandlers'
-import RawModCustomMsgHandlerTemplates from './CustomMessageHandlerTemplates'
-import KnxAddress from './KnxAddress'
-import KnxConstants from '../KnxConstants'
+import KnxMessageTemplates from '../KnxMessageTemplates'
+import KnxNetProtocol from '../KnxNetProtocol'
+import KnxAddress from '../KnxAddress'
+import RawModErrors from '../Errors'
+import RawModCustomMsgHandlers from '../CustomMsgHandlers'
+import RawModCustomMsgHandlerTemplates from '../CustomMessageHandlerTemplates'
+import KnxConstants from '../../KnxConstants'
 
 export default {
   /*
-   * Function: KnxReadDevMem.readPropertyValue()
+   * Function: KnxReadDevMem.readDevMem()
    *
-   *      This function reads the value of an specific property of an KNX device
+   *      This function reads a specified number of bytes from a specified memory address of an KNX-device
    *
    *
    * Arguments:
@@ -27,21 +27,12 @@ export default {
    *                      E.g.: 2.3.4, 11.13.26 or null, ...
    *                      Type: String/null
    *
-   *      objectIndex     Index of the object to read the property from
-   *                      E.g.: 0x00
-   *                      Type: Number
+   *      address         The memory address to read data from
+   *                      Type: Array (length: two bytes)
    *
-   *      startIndex      Index to start from
-   *                      E.g.: 0x01
-   *                      Type: Number
-   *
-   *      propertyID      ID of the property to read
-   *                      E.g.: 0x0b
-   *                      Type: Number
-   *
-   *      elementCount    Number of elements to read
-   *                      E.g.: 0x01
-   *                      Type: Number
+   *      length          Number of bytes to read from memory
+   *                      One at least and twelve at most
+   *                      Type: Integer
    *
    *      recvTimeout     Specifies how long to wait for an acknowledge message from the KNX device (in milliseconds)
    *                      Recommended to be around 2000 and should be raised to higher values when errors with the following
@@ -64,16 +55,16 @@ export default {
    *      }
    *
    *      If everything goes well, error will be zero and data will be the response-data of the target device
-   *      The first four bytes are information about the data being responded (eq. to the first four bytes of the request message)
-   *      These four bytes are formed like this:
-   *        Buffer.from([objectIndex, propertyID, ((elementCount & 0b1111) << 4) | (startIndex >> 8) & 0b1111, startIndex & 0b11111111])
-   *
-   *      The following data represents the value of the requested property. In this case it is a serial number.
+   *      Note that the data will start with two bytes being the memory address the data was read from
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x00, 0x0b, 0x10, 0x01, 0x00, 0x83, 0x3f, 0xc4, 0xe0, 0x32])
+   *          data: Buffer.from([0x00, 0x60, 0x01])
    *        }
+   *
+   *      ... being a example MemoryResponse
+   *      The first two bytes, the memory address that the data was read from - 0x0060, represent the address of the programming mode flag
+   *      The data, being 0x01, means that the device is in programming mode
    *
    *      On error, error will be set to one and data will be null
    *
@@ -86,17 +77,20 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.ERR_ReadPropertyValue.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.ERR_ReadDevMem.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.ERR_ReadDevMem.INVALID_READLEN - The length argument has an invalid value
+   *      RawModErrors.ERR_ReadDevMem.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.ERR_ReadDevMem.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.ERR_ReadDevMem.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readPropertyValue: async (target, source, objectIndex, startIndex, propertyID, elementCount, recvTimeout, conContext, errContext) => {
+  readDevMem: async (target, source, address, length, recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      Send a UCD connection request to the target device
-     *      Send a property value read request
+     *      Send a memory read request to read n=length bytes from the targets memory@address
      *      (The device should send the requested data, wait for it)
      *      Send a NCD acknowledge message back to the device
      *      Send a UCD disconnect request
@@ -107,11 +101,11 @@ export default {
       let err
       let rawModErr
       let connReq
-      let propValReadReq
+      let memReadReq
       let ackMsg
       let dconnMsg
       let timeoutRef
-      let propertyValueResponseHandlerTemplate
+      let memoryResponseHandlerTemplate
 
       // This function validates the arguments
       const checkArguments = () => {
@@ -123,9 +117,9 @@ export default {
           }
 
           // Check if all the other parameters are defined
-          if (!(target && recvTimeout && conContext)) {
-            err = new Error(RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS)
+          if ((target == null) || (address == null) || (length == null) || (recvTimeout == null) || (conContext == null)) {
+            err = new Error(RawModErrors.ERR_ReadDevMem.UNDEF_ARGS.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.UNDEF_ARGS)
 
             errContext.addNewError(rawModErr)
 
@@ -135,11 +129,22 @@ export default {
 
         // Check if all arguments have the correct type
         const checkArgumentTypes = () => {
-          if ((target.constructor !== String) || (source ? source.constructor !== String : false) ||
-            (objectIndex.constructor !== Number) || (propertyID.constructor !== Number) ||
-            (startIndex.constructor !== Number) || (elementCount.constructor !== Number) || (recvTimeout.constructor !== Number)) {
-            err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES.errorID)
+          if ((target.constructor !== String) || ((source != null) ? source.constructor !== String : false) ||
+              (address.constructor !== Array) || (length.constructor !== Number) || (recvTimeout.constructor !== Number)) {
+            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES.errorID)
+
+            errContext.addNewError(rawModErr)
+
+            return 1
+          }
+        }
+
+        // Checks if the value of 'length' arguments doesn't break its bounds (< 13 and > 0)
+        const checkLengthArgumentVal = () => {
+          if ((length > 12) || length < 1) {
+            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_READLEN.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_READLEN.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -153,9 +158,9 @@ export default {
 
           // Validate target
           if (KnxAddress.validateAddrStr(target) === -1 ||
-            KnxAddress.getAddrType(target) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-            err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_TARGET.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_TARGET.errorID)
+              KnxAddress.getAddrType(target) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
+            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_TARGET.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_TARGET.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -165,9 +170,9 @@ export default {
           // Validate source, if defined
           if (source) {
             if (KnxAddress.validateAddrStr(source) === -1 ||
-              KnxAddress.getAddrType(source) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-              err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_SOURCE.errorMsg)
-              rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_SOURCE.errorID)
+                KnxAddress.getAddrType(source) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
+              err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_SOURCE.errorMsg)
+              rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_SOURCE.errorID)
 
               errContext.addNewError(rawModErr)
 
@@ -182,25 +187,25 @@ export default {
         // Call the checking functions
         if (checkArgumentsDefined()) { return 1 }
         if (checkArgumentTypes()) { return 1 }
+        if (checkLengthArgumentVal()) { return 1 }
         if (checkTargetAndSource()) { return 1 }
       }
 
       // This function forges all the needed messages
       const forgeMessages = () => {
         connReq = KnxMessageTemplates.ucdConnRequest(target, source)
-        propValReadReq = KnxMessageTemplates.propertyValueReadRequest(target, source,
-          objectIndex, propertyID, elementCount, startIndex)
+        memReadReq = KnxMessageTemplates.memoryReadRequest(target, source, address, length)
         ackMsg = KnxMessageTemplates.ncdAckMsg(target, source)
         dconnMsg = KnxMessageTemplates.ucdDconnMsg(target, source)
       }
 
       // This function prepares the custom message handler templates
       const prepareCustomMessageHandlerTemplates = () => {
-        propertyValueResponseHandlerTemplate = RawModCustomMsgHandlerTemplates.propertyValueResponseTemplate(target, source || conContext.options.physAddr)
+        memoryResponseHandlerTemplate = RawModCustomMsgHandlerTemplates.memoryResponseTemplate(target, source || conContext.options.physAddr)
       }
 
-      // A handler for the PropertyValueResponse (Contains the 'everything-went-right' exit point)
-      const propValResponseHandler = rawMsgJson => {
+      // A handler for the MemoryResponse (Contains the 'everything-went-right' exit point)
+      const memoryResponseHandler = rawMsgJson => {
         // Check if timeoutRef is null (=> if the handler was already called once)
         if (timeoutRef == null) {
           return
@@ -212,7 +217,6 @@ export default {
         removeHandlers()
 
         // Send a NCD acknowledge message to the device
-
         KnxNetProtocol.sendTunnRequest(ackMsg, conContext, function (sendErr) {
           if (sendErr) {
             rawModErr = errContext.createNewError(sendErr, null)
@@ -224,7 +228,6 @@ export default {
           }
 
           // Send a UCD disconnect request
-
           KnxNetProtocol.sendTunnRequest(dconnMsg, conContext, function (sendErr) {
             if (sendErr) {
               rawModErr = errContext.createNewError(sendErr, null)
@@ -243,20 +246,22 @@ export default {
         })
       }
 
-      // This function registers 'propValResponseHandler'
+      // This function registers 'memoryResponseHandler'
       const registerHandler = () => {
         /*
-         * Register a handler that catches the property value response message from the device
+         * Register a handler that catches the memory response message from the device
+         * This message should arrive in any case - even if the request failed
+         *  In that case, it simply won't contain any data
          */
-        RawModCustomMsgHandlers.registerCustomMsgHandler(propertyValueResponseHandlerTemplate, propValResponseHandler, conContext)
+        RawModCustomMsgHandlers.registerCustomMsgHandler(memoryResponseHandlerTemplate, memoryResponseHandler, conContext)
       }
 
       // This function is later used to remove handlers registered below
       const removeHandlers = () => {
-        RawModCustomMsgHandlers.removeCustomMsgHandler(propertyValueResponseHandlerTemplate, conContext)
+        RawModCustomMsgHandlers.removeCustomMsgHandler(memoryResponseHandlerTemplate, conContext)
       }
 
-      // This function sends 'connReq' and 'propValReadReq' to 'target'
+      // This function sends 'connReq' and 'memReadReq' to 'target'
       const sendConnAndReadReq = () => {
         return new Promise(resolve => {
           // Send the UCD connection request
@@ -273,7 +278,7 @@ export default {
               resolve(1)
             } else {
               // Send the memory read request
-              KnxNetProtocol.sendTunnRequest(propValReadReq, conContext, sendErr => {
+              KnxNetProtocol.sendTunnRequest(memReadReq, conContext, sendErr => {
                 // Check for errors
                 if (sendErr) {
                   // Create the RawModError object
@@ -291,7 +296,7 @@ export default {
         })
       }
 
-      // This function creates a timeout for the arrival of the response of the KNX device
+      // This function creates a timeout for the arrival of the response of the KNX device ('cb' is ... -||-)
       const createRecvTimeout = (resolve) => {
         /*
          * Set a timeout that will remove the handlers if recvTimeout was reached
@@ -302,10 +307,10 @@ export default {
           removeHandlers()
 
           // Create a Error() object
-          err = new Error(RawModErrors.ERR_ReadPropertyValue.TIMEOUT_REACHED.errorMsg)
+          err = new Error(RawModErrors.ERR_ReadDevMem.TIMEOUT_REACHED.errorMsg)
 
           // Create a RawModError object
-          rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.TIMEOUT_REACHED.errorID)
+          rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.TIMEOUT_REACHED.errorID)
 
           // Push it onto the errorStack
           errContext.addNewError(rawModErr)

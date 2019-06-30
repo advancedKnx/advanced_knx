@@ -1,15 +1,15 @@
-/****************************************************************************
- * This file contains a function to read the serial number of an KNX device *
- ****************************************************************************/
+/***************************************************************************
+ * This file contains a function to read the order number of an KNX device *
+ ***************************************************************************/
 
 import KnxReadPropertyValue from './KnxReadPropertyValue'
-import KnxConstants from '../KnxConstants'
+import KnxConstants from '../../KnxConstants'
 
 export default {
   /*
-   * Function: KnxGetProgmodeStatus.readSerialNumber()
+   * Function: KnxGetProgmodeStatus.readOrderNumber()
    *
-   *      This function reads a device serial number
+   *      This function reads a devices order number
    *      It uses the KnxReadPropertyValue.readPropertyValue() function
    *
    * Arguments:
@@ -36,15 +36,11 @@ export default {
    *      }
    *
    *      If everything goes well, error will be zero and data will be the response-data of the target device
-   *      The first four bytes are information about the data being responded (eq. to the first four bytes of the request message)
-   *      These four bytes are formed like this:
-   *        Buffer.from([objectIndex, propertyID, ((elementCount & 0b1111) << 4) | (startIndex >> 8) & 0b1111, startIndex & 0b11111111])
-   *
    *      The following data represents the value of the requested property.
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x00, 0x83, 0x3f, 0xc4, 0xe0, 0x32])
+   *          data: Buffer.from([0x14, 0x30, 0x32, 0x31, 0x36, 0xff, 0xff, 0x02, 0x0f, 0x40])
    *        }
    *
    *      On error, error will be set to one and data will be null
@@ -64,16 +60,16 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readSerialNumber: async (target, recvTimeout, conContext, errContext) => {
+  readOrderNumber: async (target, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       /*
        * Pass the request to KnxReadPropertyValue.readPropertyValue()
        */
       let val = await KnxReadPropertyValue.readPropertyValue(target, conContext.options.physAddr,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.SerialNumber.objectIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.SerialNumber.startIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.SerialNumber.propertyID,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.SerialNumber.elementCount,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.objectIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.startIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.propertyID,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.elementCount,
         recvTimeout, conContext, errContext)
 
       if (!val.error) {

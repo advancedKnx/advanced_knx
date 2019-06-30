@@ -1,18 +1,18 @@
-/************************************************************************************
- * This file contains a function to read the application loadstate of an KNX device *
- ************************************************************************************/
+/***********************************************************************************
+ * This file contains a function to read the application runstate of an KNX device *
+ ***********************************************************************************/
 
-import KnxConstants from '../KnxConstants'
-import RawModErrors from './Errors'
 import KnxReadPropertyValue from './KnxReadPropertyValue'
+import KnxConstants from '../../KnxConstants'
+import RawModErrors from '../Errors'
 
 export default {
   /*
-   * Function: KnxGetProgmodeStatus.readApplicationLoadstate()
+   * Function: KnxGetProgmodeStatus.readApplicationRunstate()
    *
-   *      This function reads a devices application loadstate
-   *      (The loadstate of one of the two applications)
-   *      It uses the KnxReadDevMem().readDevMem() function
+   *      This function reads a devices application runstate
+   *      (The runstate of one of the two applications)
+   *      It uses the KnxReadPropertyValue.readPropertyValue() function
    *
    * Arguments:
    *
@@ -20,7 +20,7 @@ export default {
    *                        E.g.: '1.1.0', '1.1.250', ...
    *                        Type: String
    *
-   *      applicationIndex  The index of the application to get the loadstate from
+   *      applicationIndex  The index of the application to get the runstate from
    *                        Can be one or two
    *                        E.g.: 1, 2
    *                        Type: Number
@@ -68,15 +68,15 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readApplicationLoadstate: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
+  readApplicationRunstate: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       // Get the correct objectIndex
       let objectIndex
 
       if (applicationIndex === 1) {
-        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.objectIndex
+        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_RunState.objectIndex
       } else if (applicationIndex === 2) {
-        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_2_LoadState.objectIndex
+        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_2_RunState.objectIndex
       } else {
         const err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL.errorMsg)
         const rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL)
@@ -90,13 +90,12 @@ export default {
 
       /*
        * Pass the request to KnxReadPropertyValue.readPropertyValue()
-       * (Values for Application 1 can be used - eq. for Application 2)
        */
       let val = await KnxReadPropertyValue.readPropertyValue(target, conContext.options.physAddr,
         objectIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.startIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.propertyID,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.elementCount,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_RunState.startIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_RunState.propertyID,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_RunState.elementCount,
         recvTimeout, conContext, errContext)
 
       if (!val.error) {

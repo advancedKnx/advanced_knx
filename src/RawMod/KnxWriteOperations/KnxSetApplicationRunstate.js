@@ -2,8 +2,8 @@
  * This file contains a function to set the application runstate of an KNX device *
  **********************************************************************************/
 
-import KnxConstants from '../KnxConstants'
-import RawModErrors from './Errors'
+import KnxConstants from '../../KnxConstants'
+import RawModErrors from '../Errors'
 import KnxWriteDevMem from './KnxWriteDevMem'
 
 export default {

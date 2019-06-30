@@ -3,7 +3,7 @@
  ******************************************************************************/
 
 import KnxWriteDevMem from './KnxWriteDevMem'
-import KnxConstants from '../KnxConstants'
+import KnxConstants from '../../KnxConstants'
 
 export default {
   /*

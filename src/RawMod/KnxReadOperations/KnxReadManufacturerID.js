@@ -1,31 +1,32 @@
-/***************************************************************************
- * This file contains a function to read the order number of an KNX device *
- ***************************************************************************/
+/***********************************************************************************
+ * This file contains a function to read the application runstate of an KNX device *
+ ***********************************************************************************/
 
 import KnxReadPropertyValue from './KnxReadPropertyValue'
-import KnxConstants from '../KnxConstants'
+import KnxConstants from '../../KnxConstants'
+import RawModErrors from '../Errors'
 
 export default {
   /*
-   * Function: KnxGetProgmodeStatus.readOrderNumber()
+   * Function: KnxGetProgmodeStatus.readApplicationRunstate()
    *
-   *      This function reads a devices order number
+   *      This function reads a devices manufacturer ID
    *      It uses the KnxReadPropertyValue.readPropertyValue() function
    *
    * Arguments:
    *
-   *      target        The KNX device address of the target device
-   *                    E.g.: '1.1.0', '1.1.250', ...
-   *                    Type: String
+   *      target            The KNX device address of the target device
+   *                        E.g.: '1.1.0', '1.1.250', ...
+   *                        Type: String
    *
-   *      recvTimeout   How long to wait for an acknowledge message from the target in milliseconds
-   *                    Due to network-lags etc., a value gt. 500 is recommended
-   *                    E.g.: 500, 1000, 250, 2000
-   *                    Type: Number
+   *      recvTimeout       How long to wait for an acknowledge message from the target in milliseconds
+   *                        Due to network-lags etc., a value gt. 500 is recommended
+   *                        E.g.: 500, 1000, 250, 2000
+   *                        Type: Number
    *
-   *      conContext    The KNX connection context
+   *      conContext        The KNX connection context
    *
-   *      errContext    The RawMod error context
+   *      errContext        The RawMod error context
    *
    * Return:
    *      Returns a promise which resolves with the following JSON object:
@@ -40,7 +41,7 @@ export default {
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x14, 0x30, 0x32, 0x31, 0x36, 0xff, 0xff, 0x02, 0x0f, 0x40])
+   *          data: Buffer.from([0x01])
    *        }
    *
    *      On error, error will be set to one and data will be null
@@ -60,16 +61,16 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readOrderNumber: async (target, recvTimeout, conContext, errContext) => {
+  readManufacturerID: async (target, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       /*
        * Pass the request to KnxReadPropertyValue.readPropertyValue()
        */
       let val = await KnxReadPropertyValue.readPropertyValue(target, conContext.options.physAddr,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.objectIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.startIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.propertyID,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.OrderNumber.elementCount,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.objectIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.startIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.propertyID,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.elementCount,
         recvTimeout, conContext, errContext)
 
       if (!val.error) {

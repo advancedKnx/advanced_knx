@@ -1,23 +1,29 @@
-/***********************************************************************************
- * This file contains a function to read the application runstate of an KNX device *
- ***********************************************************************************/
+/************************************************************************************
+ * This file contains a function to read the application loadstate of an KNX device *
+ ************************************************************************************/
 
+import KnxConstants from '../../KnxConstants'
+import RawModErrors from '../Errors'
 import KnxReadPropertyValue from './KnxReadPropertyValue'
-import KnxConstants from '../KnxConstants'
-import RawModErrors from './Errors'
 
 export default {
   /*
-   * Function: KnxGetProgmodeStatus.readApplicationRunstate()
+   * Function: KnxGetProgmodeStatus.readApplicationLoadstate()
    *
-   *      This function reads a devices manufacturer ID
-   *      It uses the KnxReadPropertyValue.readPropertyValue() function
+   *      This function reads a devices application loadstate
+   *      (The loadstate of one of the two applications)
+   *      It uses the KnxReadDevMem().readDevMem() function
    *
    * Arguments:
    *
    *      target            The KNX device address of the target device
    *                        E.g.: '1.1.0', '1.1.250', ...
    *                        Type: String
+   *
+   *      applicationIndex  The index of the application to get the loadstate from
+   *                        Can be one or two
+   *                        E.g.: 1, 2
+   *                        Type: Number
    *
    *      recvTimeout       How long to wait for an acknowledge message from the target in milliseconds
    *                        Due to network-lags etc., a value gt. 500 is recommended
@@ -58,19 +64,39 @@ export default {
    *      RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS - At least one argument is undefined
    *      RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES - At least one argument has an invalid type
    *      RawModErrors.ERR_ReadPropertyValue.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL - A argument has an invalid value (applicationIndex)
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readManufacturerID: async (target, recvTimeout, conContext, errContext) => {
+  readApplicationLoadstate: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
+      // Get the correct objectIndex
+      let objectIndex
+
+      if (applicationIndex === 1) {
+        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.objectIndex
+      } else if (applicationIndex === 2) {
+        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_2_LoadState.objectIndex
+      } else {
+        const err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL.errorMsg)
+        const rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_ARGVAL)
+
+        errContext.addNewError(rawModErr)
+
+        resolve({ error: 1, data: null })
+
+        return
+      }
+
       /*
        * Pass the request to KnxReadPropertyValue.readPropertyValue()
+       * (Values for Application 1 can be used - eq. for Application 2)
        */
       let val = await KnxReadPropertyValue.readPropertyValue(target, conContext.options.physAddr,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.objectIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.startIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.propertyID,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.ManufacturerID.elementCount,
+        objectIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.startIndex,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.propertyID,
+        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_LoadState.elementCount,
         recvTimeout, conContext, errContext)
 
       if (!val.error) {

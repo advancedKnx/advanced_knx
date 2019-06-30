@@ -3,8 +3,8 @@
  *************************************************************************/
 
 import KnxReadPropertyValue from './KnxReadPropertyValue'
-import KnxConstants from '../KnxConstants'
-import RawModErrors from './Errors'
+import KnxConstants from '../../KnxConstants'
+import RawModErrors from '../Errors'
 
 export default {
   /*
