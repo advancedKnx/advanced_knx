@@ -43,6 +43,17 @@ const CustomMessageHandlerTemplates = {
       }
     }
   },
+  adcResponseTemplate: (sender, receiver) => {
+    return {
+      cemi: {
+        src_addr: sender,
+        dest_addr: receiver,
+        apdu: {
+          apci: 'ADC_Response'
+        }
+      }
+    }
+  },
   propertyValueResponseTemplate: (sender, receiver) => {
     return {
       cemi: {
