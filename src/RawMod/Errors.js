@@ -4,6 +4,7 @@
  *************************************************/
 
 const ErrorMessages = {
+  UNKNWON_ERROR: 'Unknown error!',
   UNDEF_ARGS: 'There are undefined arguments!',
   INVALID_ARGTYPES: 'Some arguments have an invalid type!',
   INVALID_ARGVAL: 'Some arguments have have an invalid value!',
@@ -18,170 +19,48 @@ const ErrorMessages = {
 }
 
 const RawModErrors = {
-  // Generic errors
-  ERR_Generic: {
-    UNDEF_ARGS: {
-      errorID: 0x1 + (0x1 << 15), // 32768
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x2 + (0x1 << 15), // 32769
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    INVALID_ARGVAL: {
-      errorID: 0x3 + (0x1 << 15), // 32770
-    }
+  UNKNWON_ERROR: {
+    errorID: (0x1 << 16), // 65536
+    errorMsg: ErrorMessages.UNKNWON_ERROR
   },
-  // Errors for KnxWriteDevMem.writeDevMem()
-  ERR_WriteDevMem: {
-    UNDEF_ARGS: {
-      errorID: 0x1 + (0x1 << 16), // 65537
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x2 + (0x1 << 16), // 65538
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    INVALID_DATALEN: {
-      errorID: 0x3 + (0x1 << 16), // 65539
-      errorMsg: ErrorMessages.INVALID_DATALEN
-    },
-    TARGET_NOTACK: {
-      errorID: 0x4 + (0x1 << 16), // 65540
-      errorMsg: ErrorMessages.TARGET_NOTACK
-    },
-    TIMEOUT_REACHED: {
-      errorID: 0x5 + (0x1 << 16), // 65541
-      errorMsg: ErrorMessages.TIMEOUT_REACHED
-    },
-    INVALID_TARGET: {
-      errorID: 0x6 + (0x1 << 16), // 65542
-      errorMsg: ErrorMessages.INVALID_TARGET
-    },
-    INVALID_SOURCE: {
-      errorID: 0x7 + (0x1 << 16), // 65543
-      errorMsg: ErrorMessages.INVALID_SOURCE
-    }
+  UNDEF_ARGS: {
+    errorID: 0x1 + (0x1 << 16), // 65537
+    errorMsg: ErrorMessages.UNDEF_ARGS
   },
-
-  // Errors for KnxReadDevMem.readDevMem()
-  ERR_ReadDevMem: {
-    UNDEF_ARGS: {
-      errorID: 0x10 + (0x1 << 16), // 65552
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x11 + (0x1 << 16), // 65553
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    INVALID_READLEN: {
-      errorID: 0x12 + (0x1 << 16), // 65554
-      errorMsg: ErrorMessages.INVALID_READLEN
-    },
-    TIMEOUT_REACHED: {
-      errorID: 0x13 + (0x1 << 16), // 65555
-      errorMsg: ErrorMessages.TIMEOUT_REACHED
-    },
-    INVALID_TARGET: {
-      errorID: 0x14 + (0x1 << 16), // 65542
-      errorMsg: ErrorMessages.INVALID_TARGET
-    },
-    INVALID_SOURCE: {
-      errorID: 0x15 + (0x1 << 16), // 65543
-      errorMsg: ErrorMessages.INVALID_SOURCE
-    }
+  INVALID_ARGTYPES: {
+    errorID: 0x2 + (0x1 << 16), // 65538
+    errorMsg: ErrorMessages.INVALID_ARGTYPES
   },
-
-  // Errors for KnxGetDeviceAddress.getDeviceAddress()
-  ERR_ReadPhysicalAddress: {
-    UNDEF_ARGS: {
-      errorID: 0x20 + (0x1 << 16), // 65568
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x21 + (0x1 << 16), // 65569
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    TIMEOUT_REACHED: {
-      errorID: 0x22 + (0x1 << 16), // 65570
-      errorMsg: ErrorMessages.TIMEOUT_REACHED
-    }
+  INVALID_ARGVAL: {
+    errorID: 0x3 + (0x1 << 16), // 65539
   },
-
-  // Errors for KnxSetDeviceAddress.setDeviceAddress()
-  ERR_WritePhysicalAddress: {
-    UNDEF_ARGS: {
-      errorID: 0x30 + (0x1 << 16), // 65584
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x31 + (0x1 << 16), // 65585
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    INVALID_NEWADDRESS: {
-      errorID: 0x32 + (0x1 << 16), // 65586
-      errorMsg: ErrorMessages.INVALID_NEWADDRESS
-    }
+  INVALID_DATALEN: {
+    errorID: 0x3 + (0x1 << 16), // 65540
+    errorMsg: ErrorMessages.INVALID_DATALEN
   },
-
-  // Errors for KnxReadPropertyValue.readPropertyValue()
-  ERR_ReadPropertyValue: {
-    UNDEF_ARGS: {
-      errorID: 0x40 + (0x1 << 16), // 65600
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x41 + (0x1 << 16), // 65601
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    TIMEOUT_REACHED: {
-      errorID: 0x42 + (0x1 << 16), // 65602
-      errorMsg: ErrorMessages.TIMEOUT_REACHED
-    },
-    INVALID_ARGVAL: {
-      errorID: 0x43 + (0x1 << 16), // 65603
-      errorMsg: ErrorMessages.INVALID_ARGVAL
-    },
-    INVALID_TARGET: {
-      errorID: 0x44 + (0x1 << 16), // 65604
-      errorMsg: ErrorMessages.INVALID_TARGET
-    },
-    INVALID_SOURCE: {
-      errorID: 0x45 + (0x1 << 16), // 65605
-      errorMsg: ErrorMessages.INVALID_SOURCE
-    }
+  INVALID_TARGET: {
+    errorID: 0x5 + (0x1 << 16), // 65541
+    errorMsg: ErrorMessages.INVALID_TARGET
   },
-
-  // Errors for KnxWritePropertyValue.writePropertyValue()
-  ERR_WritePropertyValue: {
-    UNDEF_ARGS: {
-      errorID: 0x50 + (0x1 << 16), // 65616
-      errorMsg: ErrorMessages.UNDEF_ARGS
-    },
-    INVALID_ARGTYPES: {
-      errorID: 0x51 + (0x1 << 16), // 65617
-      errorMsg: ErrorMessages.INVALID_ARGTYPES
-    },
-    INVALID_DATALEN: {
-      errorID: 0x52 + (0x1 << 16), // 65618
-      errorMsg: ErrorMessages.INVALID_DATALEN
-    },
-    TARGET_NOTACK: {
-      errorID: 0x53 + (0x1 << 16), // 65619
-      errorMsg: ErrorMessages.TARGET_NOTACK
-    },
-    TIMEOUT_REACHED: {
-      errorID: 0x54 + (0x1 << 16), // 65620
-      errorMsg: ErrorMessages.TIMEOUT_REACHED
-    },
-    INVALID_TARGET: {
-      errorID: 0x55 + (0x1 << 16), // 65621
-      errorMsg: ErrorMessages.INVALID_TARGET
-    },
-    INVALID_SOURCE: {
-      errorID: 0x56 + (0x1 << 16), // 65622
-      errorMsg: ErrorMessages.INVALID_SOURCE
-    }
+  INVALID_SOURCE: {
+    errorID: 0x6 + (0x1 << 16), // 65542
+    errorMsg: ErrorMessages.INVALID_SOURCE
+  },
+  INVALID_READLEN: {
+    errorID: 0x7 + (0x1 << 16), // 65543
+    errorMsg: ErrorMessages.INVALID_READLEN
+  },
+  INVALID_NEWADDRESS: {
+    errorID: 0x8 + (0x1 << 16), // 65544
+    errorMsg: ErrorMessages.INVALID_NEWADDRESS
+  },
+  TARGET_NOTACK: {
+    errorID: 0x9 + (0x1 << 16), // 65545
+    errorMsg: ErrorMessages.TARGET_NOTACK
+  },
+  TIMEOUT_REACHED: {
+    errorID: 0xa + (0x1 << 16), // 65546
+    errorMsg: ErrorMessages.TIMEOUT_REACHED
   }
 }
 
