@@ -15,6 +15,7 @@ import KnxGetDeviceAddress from './KnxReadOperations/KnxGetDeviceAddress'
 import KnxSetDeviceAddress from './KnxWriteOperations/KnxSetDeviceAddress'
 import KnxGetProgmodeStatus from './KnxReadOperations/KnxGetProgmodeStatus'
 import KnxSetProgmodeStatus from './KnxWriteOperations/KnxSetProgmodeStatus'
+import KnxSetApplicationRunstate from './KnxWriteOperations/KnxSetApplicationRunstate'
 import KnxReadSerialNumber from './KnxReadOperations/KnxReadSerialNumber'
 import KnxReadOrderNumber from './KnxReadOperations/KnxReadOrderNumber'
 import KnxReadApplicationID from './KnxReadOperations/KnxReadApplicationID'
@@ -23,7 +24,7 @@ import KnxReadApplicationLoadstate from './KnxReadOperations/KnxReadApplicationL
 import KnxReadGroupAddrTblLoadstate from './KnxReadOperations/KnxReadGroupAddrTblLoadstate'
 import KnxReadGroupAssociationTblLoadstate from './KnxReadOperations/KnxReadGroupAssociationTblLoadstate'
 import KnxReadManufacturerID from './KnxReadOperations/KnxReadManufacturerID'
-import KnxSetApplicationRunstate from './KnxWriteOperations/KnxSetApplicationRunstate'
+import KnxReadDeviceADC from './KnxReadOperations/KnxReadDeviceADC'
 
 // The RawMod class - providing useful definitions and functions
 export default class RawMod {
@@ -58,8 +59,9 @@ export default class RawMod {
     // These are top-level function that should be used normally
     this.KnxGetProgmodeStatus = KnxGetProgmodeStatus
     this.KnxSetProgmodeStatus = KnxSetProgmodeStatus
-    this.KnxGetDeviceAddress = KnxGetDeviceAddress
     this.KnxSetDeviceAddress = KnxSetDeviceAddress
+    this.KnxSetApplicationRunstate = KnxSetApplicationRunstate
+    this.KnxGetDeviceAddress = KnxGetDeviceAddress
     this.KnxReadSerialNumber = KnxReadSerialNumber
     this.KnxReadOrderNumber = KnxReadOrderNumber
     this.KnxReadApplicationID = KnxReadApplicationID
@@ -68,6 +70,6 @@ export default class RawMod {
     this.KnxReadGroupAddrTblLoadState = KnxReadGroupAddrTblLoadstate
     this.KnxReadGroupAssociationTblLoadState = KnxReadGroupAssociationTblLoadstate
     this.KnxReadManufacturerID = KnxReadManufacturerID
-    this.KnxSetApplicationRunstate = KnxSetApplicationRunstate
+    this.KnxReadDeviceADC = KnxReadDeviceADC
   }
 }
