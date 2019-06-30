@@ -108,6 +108,20 @@ const KnxMessageTemplates = {
     return retVal
   },
 
+  // This function can be used to craft a ADC read request - unicast
+  adcReadRequest: (destAddr, srcAddr, channel, count) => {
+    const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
+
+    retVal.dest_addr = destAddr
+    retVal.src_addr = srcAddr
+    retVal.apdu.inApciData = channel
+    retVal.apdu.data = Buffer.from([count])
+    retVal.apdu.apci = 'ADC_Read'
+    retVal.apdu.tpci = KnxConstants.KNX_TPCI_TYPES.TPCI_NDP >> 2
+
+    return retVal
+  },
+
   // This function can be used to craft a physical address read request - broadcast
   physicalAddressReadRequest: () => {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
@@ -134,7 +148,7 @@ const KnxMessageTemplates = {
     return retVal
   },
 
-  // This function can be used to craft a property value read request
+  // This function can be used to craft a property value read request - unicast
   propertyValueReadRequest: (destAddr, srcAddr, objectIndex, propertyID, elementCount, startIndex) => {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
 
@@ -147,7 +161,7 @@ const KnxMessageTemplates = {
     return retVal
   },
 
-  // This funciton can be used to craft a property value write request
+  // This funciton can be used to craft a property value write request - unicast
   propertyValueWriteRequest: (destAddr, srcAddr, objectIndex, propertyID, elementCount, startIndex, data) => {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
 
