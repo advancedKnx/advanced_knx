@@ -421,11 +421,15 @@ KnxProtocol.define('APDU', {
           hdr.tpci = apdu.tpci << 2
 
           /* Check for special cases
-           * There are APCI codes that take the full width of ten bits
-           * Extract the first two bytes of the APDU and the last ten bits of these two bytes
-           * Check if they match any APCI code
-           * Also check that the code has a greater value than KnxConstants.APCICODES.Memory_Read because all codes
-           * below it do not take the full width/they could carry data inside the APCI field
+           *
+           *  Some APCI codes take the full ten bits while some store data in the lower six bits of the APCI field
+           *
+           * Check if the ten APCI bits match any APCI code and if they have a greate value then KnxConstants.APCICODES.Memory_Read
+           *
+           *  This would mean that the APCI code fills all ten bits - no data contained in the APCI field
+           *
+           * If not, only use the first four APCI bits as APCI code and everything following it as data
+           * These four bits are stored om apdu.apci - but have to be shifted to the left to be usable
            */
           let altApciCode = ((hdr.apdu_raw[0] << 8) | hdr.apdu_raw[1]) & 0b1111111111
 
@@ -435,9 +439,26 @@ KnxProtocol.define('APDU', {
             hdr.apci = KnxConstants.keyText(KnxConstants.APCICODES, altApciCode)
             hdr.data = hdr.apdu_raw.slice(2)
           } else {
-            // Get the corresponding name for the apci code and extract the data
             hdr.apci = KnxConstants.keyText(KnxConstants.APCICODES, apdu.apci * 0x40)
-            hdr.data = (hdr.apdu_length > 1) ? hdr.apdu_raw.slice(2) : Buffer.from([apdu.data])
+            /*
+             * As said above all messages with APCI codes below KnxConstants.APCICODES.Memory_Read have data contained in the APCI field
+             * Except GroupValue_(Read|Write|Response) - These only contain data in the APCI field if nothing follows the APCI field
+             * All other can have data inside the APCI field and following it at the same time
+             */
+            if ((KnxConstants.APCICODES.GroupValue_Read <= apdu.apci * 0x40) && (apdu.apci * 0x40 <= KnxConstants.APCICODES.GroupValue_Write)) {
+              if (hdr.apdu_length <= 1) {
+                // Use only in-apci-data
+                hdr.data = Buffer.from([apdu.data])
+              } else {
+                // Use only following data
+                hdr.data = hdr.apdu_raw.slice(2)
+              }
+            } else {
+              // Use in-apci-data and following data
+              hdr.data = Buffer.concat([Buffer.from([apdu.data]), hdr.apdu_raw.slice(2)])
+            }
+            // Get the corresponding name for the apci code and extract the data
+            // hdr.data = (hdr.apdu_length > 1) ? hdr.apdu_raw.slice(2) : Buffer.from([apdu.data])
           }
 
           // Check if the apci code is known
@@ -543,19 +564,17 @@ KnxProtocol.define('APDU', {
 not always!), so that apdu_length=1 means _2_ bytes following the apdu_length */
 KnxProtocol.lengths['APDU'] = function (value) {
   if (!value) return 0
-  /** **** Added by the fork ******/
   // Check if there is a APCI field
   if (!value.apci) {
     /*
-         * The message shall no contain an APCI field and with it no data
-         * The length of such a message is fixed
-         */
+     * The message shall not contain a APCI field and with it no data
+     * The length of such a message is fixed
+     */
     return 2
   } else {
-    /*******************************/
     // if we have the APDU bitlength, usually by the DPT, then simply use it
     if (value.bitlength || (value.data && value.data.bitlength)) {
-      var bitlen = value.bitlength || value.data.bitlength
+      const bitlen = value.bitlength || value.data.bitlength
 
       // KNX spec states that up to 6 bits of payload must fit into the TPCI
       // if payload larger than 6 bits, than append it AFTER the TPCI
@@ -569,11 +588,20 @@ KnxProtocol.lengths['APDU'] = function (value) {
       if (value.data.length < 1) throw Error('APDU value is empty')
       if (value.data.length > 14) throw Error('APDU value too big, must be <= 14 bytes')
       if (value.data.length === 1) {
-        var v = value.data[0]
+        const v = value.data[0]
 
         if (!isNaN(parseFloat(v)) && isFinite(v) && v >= 0 && v <= 63) {
-          // apdu_length + tpci/apci/6-bit integer == 1+2 bytes
-          return 3
+          /*
+           * Assume that the data is to be stored inside the APCI field (Because it is smaller than 63 ==> 6-bit):
+           *  apdu_length(1 Byte) + tpci/apci/6-bit integer(2 Byte) === 1+2 bytes === 3
+           * Except when the APCI field already contains data
+           *  apdu_length(1 Byte) + tpci/apci/6-bit integer(2 Byte) + data(1 Byte) === 1+2+1 bytes === 4
+           */
+          if (!value.hasOwnProperty('inApciData')) {
+            return 3
+          } else {
+            return 4
+          }
         }
       }
 
