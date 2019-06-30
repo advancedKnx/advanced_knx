@@ -173,6 +173,8 @@ KnxConstants.KNX_MEMORY_ADDRS = {
   MEMORY_PROGMODE_ADDR: [0x00, 0x60], // Address of the progmode flag
   MEMORY_LOADSTATE_APP1_ADDR: [0xb6, 0xec], // Address of the loadstate of application one
   MEMORY_LOADSTATE_APP2_ADDR: [0xb6, 0xed], // Address of the loadstate of application two
+  MEMORY_RUNSTATE_APP1_ADDR: [0x01, 0x01], // Address of the runstate of application one
+  MEMORY_RUNSTATE_APP2_ADDR: [0x01, 0x02], // Address of the runstate of application one
   MEMORY_GROUP_ADDR_TBL_LOADSTATE_ADDR: [0xb6, 0xea], // Address of the group address table loadstate
   MEMORY_GROUP_ASSOCIATION_TBL_LOADSTATE_ADDR: [0xb6, 0xeb] // Address of the group address association loadstate
 }
@@ -209,6 +211,7 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
     elementCount: 0x01,
     startIndex: 0x01
   },
+  // Application Runstates don't seem to be writable trough the Property interface
   Application_1_RunState: {
     objectIndex: 0x03,
     propertyID: 0x06,
@@ -227,6 +230,7 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
     elementCount: 0x01,
     startIndex: 0x01
   },
+  // Application Runstates don't seem to be writable trough the Property interface
   Application_2_RunState: {
     objectIndex: 0x04,
     propertyID: 0x06,
@@ -245,6 +249,7 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
 KnxConstants.KNX_DEV_APLLICATION_RUNSTATES = {
   ApplicationOffline: 0x00,
   ApplicationOnline: 0x01,
+  // Application Runstate 0x2 can apparently not be written to devices
   ApplicationReady: 0x02,
   ApplicationDisabled: 0x3
 }

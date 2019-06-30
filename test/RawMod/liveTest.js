@@ -12,9 +12,11 @@ const con = Knx.Connection({
   minimumDelay: 0,
   debug: false, // When false, log level is info
   autoReconnect: true,
-  reconnectDelayMs: 2500,
+  reconnectDelayMs: 1000,
   receiveAckTimeout: 1000,
   readGroupValTimeout: 4000,
+  connstateRequestInterval: 10000,
+  connstateResponseTimeout: 2000,
   handlers: {
     connected: async () => {
       console.log('>>> Successfully connected to the KNX-IP interface @ %s <<<', con.ipAddr)
@@ -129,6 +131,30 @@ const con = Knx.Connection({
         }
 
         console.log('[*] Got answer:', Buffer.from(val.data))
+      } else if (process.argv[2] === 'read_manufacturer_id') {
+        let val = await Knx.RawMod.KnxReadManufacturerID.readManufacturerID(process.argv[3], 2000, con, Knx.RawMod.errorHandler)
+
+        if (val.error) {
+          console.log('[-] Error!\n', Knx.RawMod.errorHandler.getLastError())
+          return
+        }
+
+        console.log('[*] Got answer:', Buffer.from(val.data))
+      } else if (process.argv[2] === 'set_application_runstate') {
+        console.log('[*] Setting the runstate of application %d of %s to %d ...', parseInt(process.argv[3]), process.argv[5], parseInt(process.argv[4]))
+        let val = await Knx.RawMod.KnxSetApplicationRunstate.setApplicationRunstate(process.argv[5], parseInt((process.argv[3])), parseInt(process.argv[4]), 2000, con, Knx.RawMod.errorHandler)
+
+        if (val) {
+          console.log('ERROR:', Knx.RawMod.errorHandler.getLastError())
+        }
+
+        val = await Knx.RawMod.KnxReadApplicationRunstate.readApplicationRunstate(process.argv[5], parseInt(process.argv[3]), 2000, con, Knx.RawMod.errorHandler)
+
+        if (val.error) {
+          console.log('ERROR:', Knx.RawMod.errorHandler.getLastError())
+        } else {
+          console.log('New Application(%d) Runstate:', parseInt(process.argv[3]), val.data)
+        }
       } else if (process.argv[2] === 'nothing') {
       } else {
         console.log('[-] Unknown operation \'%s\' ...\n\tTry: %s %s help', process.argv[2], process.argv[0], process.argv[1])
@@ -140,7 +166,7 @@ const con = Knx.Connection({
     },
 
     event: function (evt, src, dst, val) {
-      console.log(evt, src, dst, val)
+      // console.log(evt, src, dst, val)
     },
 
     error: function (stat) {
@@ -149,7 +175,7 @@ const con = Knx.Connection({
 
     rawMsgCb: function (rawKnxMsg /*, rawMsgJson */) {
       // console.log(rawMsgJson)
-      console.log(rawKnxMsg)
+      // console.log(rawKnxMsg)
     },
 
     connFailCb: function () {
@@ -172,14 +198,14 @@ const con = Knx.Connection({
       {
         template: {
           cemi: {
-            ctrl: {
-              hopCount: 6
-            },
-            src_addr: '1.1.3'
+            src_addr: '1.1.3',
+            apdu: {
+              apci: 'PropertyValue_Response'
+            }
           }
         },
-        callback: function (/* rawMsgJson */) {
-          console.log('[MSG] Got a message with hopCount = 6 and src_addr = 1.1.3')
+        callback: function (rawMsgJson) {
+          // console.log('RESPONSE:', rawMsgJson.cemi.apdu.data, rawMsgJson.cemi.apdu.data[4] !== 3 ? 'HERE' : '')
         }
       }
     ]
@@ -196,11 +222,12 @@ if (process.argv[2] === 'help') {
   console.log('                 read_physical_addr')
   console.log('                 read_serial_number              [address(1.2.3, 1.1.1, ...)]')
   console.log('                 read_order_number               [address(1.2.3, 1.1.1, ...)]')
-  console.log('                 read_application_id             [id(1, 2)] [address(1.2.3, 1.1.1, ...)]')
-  console.log('                 read_application_runstate       [id(1, 2)] [address(1.2.3, 1.1.1, ...)]')
-  console.log('                 read_application_loadstate      [id(1, 2)] [address(1.2.3, 1.1.1, ...)]')
+  console.log('                 read_application_id             [index(1, 2)] [address(1.2.3, 1.1.1, ...)]')
+  console.log('                 read_application_runstate       [index(1, 2)] [address(1.2.3, 1.1.1, ...)]')
+  console.log('                 read_application_loadstate      [index(1, 2)] [address(1.2.3, 1.1.1, ...)]')
   console.log('                 read_gaddr_tbl_loadstate        [address(1.2.3, 1.1.1, ...)]')
   console.log('                 read_gassociation_tbl_loadstate [address(1.2.3, 1.1.1, ...)]')
+  console.log('                 set_application_runstate        [index(1, 2)] [newState(0, 1, 3)] [address(1.2.3, 1.1.1, ...)]')
   console.log('                 nothing')
   console.log('\nExample: yarn liveTest switch_state 1 0/1/0')
   process.exit(0)
@@ -208,14 +235,22 @@ if (process.argv[2] === 'help') {
 
 // This function disconnects from the KNX-IP interface
 const disconnect = () => {
-  if (disconnectCalled) {
-    return
+  if (con.isConnected) {
+    if (disconnectCalled) {
+      return
+    }
+
+    disconnectCalled = true
+
+    console.log('[*] Disconnecting ...')
+    con.Disconnect()
+  } else {
+    console.log('[*] Already disconnected ...')
   }
 
-  disconnectCalled = true
-
-  console.log('[*] Disconnecting ...')
-  con.Disconnect()
+  setTimeout(() => {
+    process.exit()
+  }, 2000)
 }
 
 // Catch every event and call the disconnect() function
@@ -224,4 +259,8 @@ const disconnect = () => {
 })
 
 // Connect to the KNX-IP interface
-con.Connect()
+let err = con.Connect()
+
+if (err && err.constructor === Error) {
+  console.log(err)
+}
