@@ -18,6 +18,20 @@ const ErrorMessages = {
 }
 
 const RawModErrors = {
+  // Generic errors
+  ERR_Generic: {
+    UNDEF_ARGS: {
+      errorID: 0x1 + (0x1 << 15), // 32768
+      errorMsg: ErrorMessages.UNDEF_ARGS
+    },
+    INVALID_ARGTYPES: {
+      errorID: 0x2 + (0x1 << 15), // 32769
+      errorMsg: ErrorMessages.INVALID_ARGTYPES
+    },
+    INVALID_ARGVAL: {
+      errorID: 0x3 + (0x1 << 15), // 32770
+    }
+  },
   // Errors for KnxWriteDevMem.writeDevMem()
   ERR_WriteDevMem: {
     UNDEF_ARGS: {
