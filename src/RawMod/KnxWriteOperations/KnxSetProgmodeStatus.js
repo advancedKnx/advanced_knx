@@ -42,11 +42,13 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadDevMem_UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadDevMem_INVALID_ARGTYPES - At least one arguments has an invalid type
-   *      RawModErrors.ERR_WriteDevMem_INVALID_DATALEN - The data argument has an invalid length
-   *      RawModErrors.ERR_WriteDevMem_TARGET_NOTACK- The target device did actively not acknowledge
-   *      RawModErrors.ERR_WriteDevMem_TIMEOUT_REACHED - The target device failed to respond in recvTimeout ms
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one arguments has an invalid type
+   *      RawModErrors.INVALID_DATALEN - The data argument has an invalid length
+   *      RawModErrors.TARGET_NOTACK- The target device did actively not acknowledge
+   *      RawModErrors.TIMEOUT_REACHED - The target device failed to respond in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */

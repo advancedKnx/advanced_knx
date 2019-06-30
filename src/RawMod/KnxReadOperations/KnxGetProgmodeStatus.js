@@ -20,20 +20,18 @@ export default {
    *      recvTimeout     Specifies how long to wait for an acknowledge message from the KNX device (in milliseconds)
    *                      Recommended to be around 2000 and should be raised to higher values when errors with the following
    *                      errorIDs are occurring:
-   *                        65542 ('The target failed to respond!')
+   *                        65546 ('The target failed to respond!')
    *                      Type: Integer
    *
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
-   *                      Type: require('Connection.js').Connection()
    *
    *      errContext      The RawMod error context - needed to indicate errors
-   *                      Type: require('RawMod/RawModErrorHandler.js').RawModErrorHandler()
    *
    * Return:
    *      Returns a promise which resolves with
    *
    *        {
-   *          data: [progmodeStatus],
+   *          data: Buffer.from([progmodeStatus]),
    *          error: 0
    *        }
    *
@@ -48,10 +46,12 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadDevMem_UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadDevMem_INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.ERR_ReadDevMem_INVALID_READLEN - The length argument has an invalid value
-   *      RawModErrors.ERR_ReadDevMem_TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.INVALID_READLEN - The length argument has an invalid value
+   *      RawModErrors.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
@@ -70,9 +70,9 @@ export default {
        */
       let val = await KnxReadDevMem.readDevMem(target, conContext.options.physAddr, KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR, 1, recvTimeout, conContext, errContext)
 
-      // Copy the data into 'retVal' and cut off the first two bytes - the memory address
+      // Copy the data into 'retVal' and cut off the first three bytes (the byte count and the memory address)
       if (!(retVal.error = val.error)) {
-        retVal.data = val.data.slice(2)
+        retVal.data = val.data.slice(3)
       }
 
       // Return the result

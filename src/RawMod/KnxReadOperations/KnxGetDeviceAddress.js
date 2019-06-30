@@ -22,14 +22,12 @@ export default {
    *      recvTimeout     Specifies how long to wait for an acknowledge message from the KNX device (in milliseconds)
    *                      Recommended to be around 2000 and should be raised to higher values when errors with the following
    *                      errorIDs are occurring:
-   *                        65542 ('The target failed to respond!')
+   *                        65546 ('The target failed to respond!')
    *                      Type: Integer
    *
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
-   *                      Type: require('Connection.js').Connection()
    *
    *      errContext      The RawMod error context - needed to indicate errors
-   *                      Type: require('RawMod/RawModErrorHandler.js').RawModErrorHandler()
    *
    * Return:
    *      Returns a promise which resolves with
@@ -50,9 +48,9 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadPhysicalAddress.UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadPhysicalAddress.INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.ERR_ReadPhysicalAddress.TIMEOUT_REACHED - No device responded in time
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.TIMEOUT_REACHED - No device responded in time
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
@@ -82,8 +80,8 @@ export default {
 
           // Check if all the other parameters are defined
           if ((recvTimeout == null) || (conContext == null)) {
-            err = new Error(RawModErrors.ERR_ReadPhysicalAddress.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPhysicalAddress.UNDEF_ARGS.errorID)
+            err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -94,8 +92,8 @@ export default {
         // Check if all arguments have the correct type
         const checkArgumentTypes = () => {
           if (recvTimeout.constructor !== Number) {
-            err = new Error(RawModErrors.ERR_ReadPhysicalAddress.INVALID_ARGTYPES.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPhysicalAddress.INVALID_ARGTYPES.errorID)
+            err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -190,10 +188,10 @@ export default {
           removeHandlers()
 
           // Create a Error() object
-          err = new Error(RawModErrors.ERR_ReadPhysicalAddress.TIMEOUT_REACHED.errorMsg)
+          err = new Error(RawModErrors.TIMEOUT_REACHED.errorMsg)
 
           // Create a RawModError object
-          rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPhysicalAddress.TIMEOUT_REACHED.errorID)
+          rawModErr = errContext.createNewError(err, RawModErrors.TIMEOUT_REACHED.errorID)
 
           // Push it onto the errorStack
           errContext.addNewError(rawModErr)

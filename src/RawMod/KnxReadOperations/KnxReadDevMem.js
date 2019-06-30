@@ -37,7 +37,7 @@ export default {
    *      recvTimeout     Specifies how long to wait for an acknowledge message from the KNX device (in milliseconds)
    *                      Recommended to be around 2000 and should be raised to higher values when errors with the following
    *                      errorIDs are occurring:
-   *                        65555 ('The target failed to respond!')
+   *                        65546 ('The target failed to respond!')
    *                      Type: Integer
    *
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
@@ -59,11 +59,12 @@ export default {
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x00, 0x60, 0x01])
+   *          data: Buffer.from([0x01, 0x00, 0x60, 0x01])
    *        }
    *
    *      ... being a example MemoryResponse
-   *      The first two bytes, the memory address that the data was read from - 0x0060, represent the address of the programming mode flag
+   *      The first bytes being the amount of bytes read. The second two bytes, the memory address that the data was read from - 0x0060,
+   *        represent the address of the programming mode flag
    *      The data, being 0x01, means that the device is in programming mode
    *
    *      On error, error will be set to one and data will be null
@@ -77,12 +78,12 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadDevMem.UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.ERR_ReadDevMem.INVALID_READLEN - The length argument has an invalid value
-   *      RawModErrors.ERR_ReadDevMem.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
-   *      RawModErrors.ERR_ReadDevMem.INVALID_TARGET - target isn't a valid KNX address
-   *      RawModErrors.ERR_ReadDevMem.INVALID_SOURCE - source is defined and it isn't a valid KNX address
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.INVALID_READLEN - The length argument has an invalid value
+   *      RawModErrors.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
@@ -118,8 +119,8 @@ export default {
 
           // Check if all the other parameters are defined
           if ((target == null) || (address == null) || (length == null) || (recvTimeout == null) || (conContext == null)) {
-            err = new Error(RawModErrors.ERR_ReadDevMem.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.UNDEF_ARGS)
+            err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS)
 
             errContext.addNewError(rawModErr)
 
@@ -131,8 +132,8 @@ export default {
         const checkArgumentTypes = () => {
           if ((target.constructor !== String) || ((source != null) ? source.constructor !== String : false) ||
               (address.constructor !== Array) || (length.constructor !== Number) || (recvTimeout.constructor !== Number)) {
-            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES.errorID)
+            err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -143,8 +144,8 @@ export default {
         // Checks if the value of 'length' arguments doesn't break its bounds (< 13 and > 0)
         const checkLengthArgumentVal = () => {
           if ((length > 12) || length < 1) {
-            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_READLEN.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_READLEN.errorID)
+            err = new Error(RawModErrors.INVALID_READLEN.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_READLEN.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -159,8 +160,8 @@ export default {
           // Validate target
           if (KnxAddress.validateAddrStr(target) === -1 ||
               KnxAddress.getAddrType(target) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-            err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_TARGET.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_TARGET.errorID)
+            err = new Error(RawModErrors.INVALID_TARGET.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_TARGET.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -171,8 +172,8 @@ export default {
           if (source) {
             if (KnxAddress.validateAddrStr(source) === -1 ||
                 KnxAddress.getAddrType(source) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-              err = new Error(RawModErrors.ERR_ReadDevMem.INVALID_SOURCE.errorMsg)
-              rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.INVALID_SOURCE.errorID)
+              err = new Error(RawModErrors.INVALID_SOURCE.errorMsg)
+              rawModErr = errContext.createNewError(err, RawModErrors.INVALID_SOURCE.errorID)
 
               errContext.addNewError(rawModErr)
 
@@ -307,10 +308,10 @@ export default {
           removeHandlers()
 
           // Create a Error() object
-          err = new Error(RawModErrors.ERR_ReadDevMem.TIMEOUT_REACHED.errorMsg)
+          err = new Error(RawModErrors.TIMEOUT_REACHED.errorMsg)
 
           // Create a RawModError object
-          rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadDevMem.TIMEOUT_REACHED.errorID)
+          rawModErr = errContext.createNewError(err, RawModErrors.TIMEOUT_REACHED.errorID)
 
           // Push it onto the errorStack
           errContext.addNewError(rawModErr)

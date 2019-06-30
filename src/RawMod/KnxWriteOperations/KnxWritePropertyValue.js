@@ -65,13 +65,13 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadDevMem.UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadDevMem.INVALID_ARGTYPES - At least one arguments has an invalid type
-   *      RawModErrors.ERR_WriteDevMem.INVALID_DATALEN - The data argument has an invalid length
-   *      RawModErrors.ERR_WriteDevMem.TARGET_NOTACK- The target device did actively not acknowledge
-   *      RawModErrors.ERR_WriteDevMem.TIMEOUT_REACHED - The target device failed to respond in recvTimeout ms
-   *      RawModErrors.ERR_ReadDevMem.INVALID_TARGET - target isn't a valid KNX address
-   *      RawModErrors.ERR_ReadDevMem.INVALID_SOURCE - source is defined and it isn't a valid KNX address
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one arguments has an invalid type
+   *      RawModErrors.INVALID_DATALEN - The data argument has an invalid length
+   *      RawModErrors.TARGET_NOTACK- The target device did actively not acknowledge
+   *      RawModErrors.TIMEOUT_REACHED - The target device failed to respond in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
@@ -108,8 +108,8 @@ export default {
 
           // Check if all the other parameters are defined
           if (!(target && recvTimeout && conContext && data)) {
-            err = new Error(RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS)
+            err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS)
 
             errContext.addNewError(rawModErr)
 
@@ -122,8 +122,8 @@ export default {
           if ((target.constructor !== String) || (source ? source.constructor !== String : false) ||
             (objectIndex.constructor !== Number) || (propertyID.constructor !== Number) || (data.constructor !== Buffer) ||
             (startIndex.constructor !== Number) || (elementCount.constructor !== Number) || (recvTimeout.constructor !== Number)) {
-            err = new Error(RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES.errorID)
+            err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -134,8 +134,8 @@ export default {
         // This function checks the data argument (data.length <= 10 && >= 1)
         const checkDataVal = () => {
           if ((data.length > 10) || data.length < 1) {
-            err = new Error(RawModErrors.ERR_WriteDevMem.INVALID_DATALEN.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_WriteDevMem.INVALID_DATALEN.errorID)
+            err = new Error(RawModErrors.INVALID_DATALEN.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_DATALEN.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -150,8 +150,8 @@ export default {
           // Validate target
           if (KnxAddress.validateAddrStr(target) === -1 ||
             KnxAddress.getAddrType(target) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-            err = new Error(RawModErrors.ERR_WriteDevMem.INVALID_TARGET.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_WriteDevMem.INVALID_TARGET.errorID)
+            err = new Error(RawModErrors.INVALID_TARGET.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_TARGET.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -162,8 +162,8 @@ export default {
           if (source) {
             if (KnxAddress.validateAddrStr(source) === -1 ||
               KnxAddress.getAddrType(source) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
-              err = new Error(RawModErrors.ERR_WriteDevMem.INVALID_SOURCE.errorMsg)
-              rawModErr = errContext.createNewError(err, RawModErrors.ERR_WriteDevMem.INVALID_SOURCE.errorID)
+              err = new Error(RawModErrors.INVALID_SOURCE.errorMsg)
+              rawModErr = errContext.createNewError(err, RawModErrors.INVALID_SOURCE.errorID)
 
               errContext.addNewError(rawModErr)
 
@@ -260,8 +260,8 @@ export default {
             return
           }
 
-          err = new Error(RawModErrors.ERR_WriteDevMem.TARGET_NOTACK.errorMsg)
-          rawModErr = errContext.createNewError(sendErr, RawModErrors.ERR_WriteDevMem.TARGET_NOTACK.errorID)
+          err = new Error(RawModErrors.TARGET_NOTACK.errorMsg)
+          rawModErr = errContext.createNewError(sendErr, RawModErrors.TARGET_NOTACK.errorID)
 
           errContext.addNewError(rawModErr)
 
@@ -325,10 +325,10 @@ export default {
           removeHandlers()
 
           // Create a Error() object
-          err = new Error(RawModErrors.ERR_WriteDevMem.TIMEOUT_REACHED.errorMsg)
+          err = new Error(RawModErrors.TIMEOUT_REACHED.errorMsg)
 
           // Create a RawModError object
-          rawModErr = errContext.createNewError(err, RawModErrors.ERR_WriteDevMem.TIMEOUT_REACHED.errorID)
+          rawModErr = errContext.createNewError(err, RawModErrors.TIMEOUT_REACHED.errorID)
 
           // Push it onto the errorStack
           errContext.addNewError(rawModErr)

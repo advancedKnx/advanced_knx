@@ -58,9 +58,11 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_ReadPropertyValue.UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_ReadPropertyValue.INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.ERR_ReadPropertyValue.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */

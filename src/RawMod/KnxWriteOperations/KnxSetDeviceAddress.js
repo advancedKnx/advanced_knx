@@ -34,9 +34,11 @@ export default {
    *      Type: Promise
    *
    * Errors:
-   *      RawModErrors.ERR_WritePhysicalAddress.UNDEF_ARGS - At least one argument is undefined
-   *      RawModErrors.ERR_WritePhysicalAddress.INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.ERR_WritePhysicalAddress.INVALID_ADDRESS - The address the was requested to be written is invalid
+   *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.INVALID_ADDRESS - The address the was requested to be written is invalid
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *
    *      There may be other errors not labeled by RawMod (thrown by the socket API when sending messages)
    */
@@ -65,8 +67,8 @@ export default {
 
           // Check if all the other parameters are defined
           if ((newAddr == null) || (conContext == null)) {
-            err = new Error(RawModErrors.ERR_WritePhysicalAddress.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError.errorID(err, RawModErrors.ERR_WritePhysicalAddress.UNDEF_ARGS)
+            err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
+            rawModErr = errContext.createNewError.errorID(err, RawModErrors.UNDEF_ARGS)
 
             errContext.addNewError(rawModErr)
 
@@ -77,8 +79,8 @@ export default {
         // Check if all arguments have the correct type
         const checkArgumentTypes = () => {
           if (newAddr.constructor !== String) {
-            err = new Error(RawModErrors.ERR_WritePhysicalAddress.INVALID_ARGTYPES.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.ERR_WritePhysicalAddress.INVALID_ARGTYPES.errorID)
+            err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
+            rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
             errContext.addNewError(rawModErr)
 
@@ -97,8 +99,8 @@ export default {
 
         // Check the return value
         if (newAddrBuf == null) {
-          err = new Error(RawModErrors.ERR_WritePhysicalAddress.INVALID_ADDRESS.errorMsg)
-          rawModErr = errContext.createNewError(err, RawModErrors.ERR_WritePhysicalAddress.INVALID_ADDRESS.errorID)
+          err = new Error(RawModErrors.INVALID_NEWADDRESS.errorMsg)
+          rawModErr = errContext.createNewError(err, RawModErrors.INVALID_NEWADDRESS.errorID)
 
           errContext.addNewError(rawModErr)
 
