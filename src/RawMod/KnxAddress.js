@@ -139,8 +139,8 @@ export default class KnxAddress {
    * Return:
    *
    *      addrBin         addressStr converted into the actual KNX address it represented
-   *                      E.g.: Uint16Array.from([0x8802]), ...
-   *                      Type: Uint16Array
+   *                      E.g.: 0x8202, ...
+   *                      Type: Number
    *
    * Errors:
    *
@@ -149,7 +149,7 @@ export default class KnxAddress {
    *        A invalid amount of separation characters are used
    */
   static strToBin (addressStr) {
-    const addrBin = new Uint16Array(1)
+    let addrBin
     let addrStrParts
 
     // Check if addressStr is defined and if it has a .lastIndexOf() function
@@ -169,16 +169,16 @@ export default class KnxAddress {
         case 1:
           // Level 2 group address (one separator)
           // The first five bits consist of the first part, the lower eleven of the second one
-          addrBin[0] = (parseInt(addrStrParts[0]) % (2 ** 5)) << 11
-          addrBin[0] |= parseInt(addrStrParts[1]) % (2 ** 11)
+          addrBin = (parseInt(addrStrParts[0]) % (2 ** 5)) << 11
+          addrBin |= parseInt(addrStrParts[1]) % (2 ** 11)
 
           break
         case 2:
           // Level 3 group address (two separators)
           // The first five bits consist of the first part, the middle three of the second part and the lower eight of the third one
-          addrBin[0] = (parseInt(addrStrParts[0]) % (2 ** 5)) << 11
-          addrBin[0] |= (parseInt(addrStrParts[1]) % (2 ** 3)) << 8
-          addrBin[0] |= parseInt(addrStrParts[2]) % (2 ** 8)
+          addrBin = (parseInt(addrStrParts[0]) % (2 ** 5)) << 11
+          addrBin |= (parseInt(addrStrParts[1]) % (2 ** 3)) << 8
+          addrBin |= parseInt(addrStrParts[2]) % (2 ** 8)
 
           break
         default:
@@ -190,9 +190,9 @@ export default class KnxAddress {
       addrStrParts = addressStr.split('.')
 
       // The first four bits are part one, the second four part two and the last eight part three
-      addrBin[0] = (parseInt(addrStrParts[0]) % (2 ** 4)) << 12
-      addrBin[0] |= (parseInt(addrStrParts[1]) % (2 ** 4)) << 8
-      addrBin[0] |= (parseInt(addrStrParts[2]) % (2 ** 8))
+      addrBin = (parseInt(addrStrParts[0]) % (2 ** 4)) << 12
+      addrBin |= (parseInt(addrStrParts[1]) % (2 ** 4)) << 8
+      addrBin |= (parseInt(addrStrParts[2]) % (2 ** 8))
     } else {
       // Unknown address type
       return null
@@ -210,8 +210,8 @@ export default class KnxAddress {
    * Arguments:
    *
    *      addressBin      A valid KNX address
-   *                      E.g.: Uint16Array.from([0x8802]), ...
-   *                      Type: Uint16Array
+   *                      E.g.: 0x1802, ...
+   *                      Type: Number
    *
    * Return:
    *
@@ -250,8 +250,8 @@ export default class KnxAddress {
    * Arguments:
    *
    *      addressBin      A valid KNX address
-   *                      E.g.: Uint16Array.from([0x8802]), ...
-   *                      Type: Uint16Array
+   *                      E.g.: 0x2202, ...
+   *                      Type: Number
    *
    * Return:
    *
@@ -294,8 +294,8 @@ export default class KnxAddress {
    * Arguments:
    *
    *      addressBin      A valid KNX address
-   *                      E.g.: Uint16Array.from([0x8802]), ...
-   *                      Type: Uint16Array
+   *                      E.g.: 0x1113, ...
+   *                      Type: Number
    *
    * Return:
    *
@@ -333,13 +333,13 @@ export default class KnxAddress {
   /*
    * Function: KnxAddress.UInt16ToUInt8Arr()
    *
-   *      This function converts a KNX address stored in UInt16 format, as returned from strToBin(), to a UInt7 array
+   *      This function converts a KNX address stored in UInt16 format to an UInt8Array
    *      consisting of two members, the first one being the first eight bit of the address
    *
    * Arguments:
    *
    *      addressBinUInt16    A KNX address stored as UInt16
-   *                          E.g.: Uint16Array.from([0x8802]), ...
+   *                          E.g.: Uint16Array.from([0x1102]), ...
    *                          Type: Uint16Array/Single 16-bit value
    *
    * Return:
@@ -351,6 +351,23 @@ export default class KnxAddress {
     return Uint8Array.from([(addressBinUInt16 >> 8), (addressBinUInt16 & 0b11111111)])
   }
 
+  /*
+   * Function: KnxAddress.UInt8ToUInt16Arr()
+   *
+   *      This function converts a KNX address stored in UInt8 format to UInt16Array
+   *      consisting of two members, the first one being the first eight bit of the address
+   *
+   * Arguments:
+   *
+   *      addressBinUInt8     A KNX address stored as UInt8Array
+   *                          E.g.: Uint8Array.from([0x11, 0x02]), ...
+   *                          Type: Uint8Array/Single 8-bit value
+   *
+   * Return:
+   *
+   *      addrUInt16          The address stored as Uint16Array
+   *                          Type: Uint16Array
+   */
   static Uint8ArrToUint16Addr (addressBinUint8Arr) {
     return Uint16Array.from([(addressBinUint8Arr[0] << 8) | addressBinUint8Arr[1]])
   }

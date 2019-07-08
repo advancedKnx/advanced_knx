@@ -74,100 +74,100 @@ export default {
     // Individual addresses
     {
       inputs: ['1.1.2'],
-      expected: Uint16Array.from([0x1102])
+      expected: 0x1102
     },
     {
       inputs: ['2.2.2'],
-      expected: Uint16Array.from([0x2202])
+      expected: 0x2202
     },
     {
       inputs: ['1.10.255'],
-      expected: Uint16Array.from([0x1aff])
+      expected: 0x1aff
     },
     {
       inputs: ['15.15.0'],
-      expected: Uint16Array.from([0xff00])
+      expected: 0xff00
     },
     {
       inputs: ['10.5.10'],
-      expected: Uint16Array.from([0xa50a])
+      expected: 0xa50a
     },
     {
       inputs: ['1.1.2'],
-      expected: Uint16Array.from([0x1102])
+      expected: 0x1102
     },
     {
       inputs: ['15.15.255'],
-      expected: Uint16Array.from([0xffff])
+      expected: 0xffff
     },
     // Test some invalid ranges for individual addresses
     {
       inputs: ['16.16.256'], // 0.0.0
-      expected: Uint16Array.from([0x0000])
+      expected: 0x0000
     },
     {
       inputs: ['17.17.257'], // 1.1.1
-      expected: Uint16Array.from([0x1101])
+      expected: 0x1101
     },
     {
       inputs: ['33.33.513'], // 1.1.1
-      expected: Uint16Array.from([0x1101])
+      expected: 0x1101
     },
     // Group addresses (Level 3)
     {
       inputs: ['1/7/255'],
-      expected: Uint16Array.from([0x0fff])
+      expected: 0x0fff
     },
     {
       inputs: ['20/0/0'],
-      expected: Uint16Array.from([0xa000])
+      expected: 0xa000
     },
     {
       inputs: ['0/7/0'],
-      expected: Uint16Array.from([0x0700])
+      expected: 0x0700
     },
     {
       inputs: ['31/7/255'],
-      expected: Uint16Array.from([0xffff])
+      expected: 0xffff
     },
     // Test some invalid ranges for group (Level 3) addresses
     {
       inputs: ['32/8/256'], // 0/0/0
-      expected: Uint16Array.from([0x0000])
+      expected: 0x0000
     },
     {
       inputs: ['33/9/257'], // 1/1/1
-      expected: Uint16Array.from([0x0901])
+      expected: 0x0901
     },
     {
       inputs: ['65/17/513'], // 1/1/1
-      expected: Uint16Array.from([0x0901])
+      expected: 0x0901
     },
     // Group addresses (Level 2)
     {
       inputs: ['3/1000'],
-      expected: Uint16Array.from([0x1be8])
+      expected: 0x1be8
     },
     {
       inputs: ['0/0'],
-      expected: Uint16Array.from([0x0000])
+      expected: 0x0000
     },
     {
       inputs: ['31/2047'],
-      expected: Uint16Array.from([0xffff])
+      expected: 0xffff
     },
     // Test some invalid ranges for group (Level 2) addresses
     {
       inputs: ['32/2048'], // 0/0
-      expected: Uint16Array.from([0x0000])
+      expected: 0x0000
     },
     {
       inputs: ['33/2049'], // 1/1
-      expected: Uint16Array.from([0x0801])
+      expected: 0x0801
     },
     {
       inputs: ['65/4097'], // 1/1
-      expected: Uint16Array.from([0x0801])
+      expected: 0x0801
     },
     // Some completely invalid inputs
     {
@@ -196,7 +196,7 @@ export default {
     },
     {
       inputs: ['31/2047'],
-      expected: Uint16Array.from([0xffff])
+      expected: 0xffff
     }
   ],
 
