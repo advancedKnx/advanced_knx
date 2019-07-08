@@ -15,7 +15,6 @@ const KnxConstants = require('./KnxConstants')
 const KnxLog = require('./KnxLog')
 
 // defaults
-KnxProtocol.twoLevelAddressing = false
 KnxProtocol.lengths = {}
 
 // helper function: what is the byte length of an object?
@@ -633,11 +632,12 @@ KnxProtocol.define('CEMI', {
         // KNX source addresses are always physical
         hdr.src_addr = KnxAddress.binToInd(KnxAddress.Uint8ArrToUint16Addr(hdr.src_addr))
 
-        // Check the type of the dest_addr and convert it into the corresponding string
+        /*
+         * Check the type of the dest_addr and convert it into the corresponding string
+         * Group addresses are stored as raw number so the user can chose a representation
+         */
         if (hdr.ctrl.destAddrType === KnxConstants.KNX_ADDR_TYPES.DEVICE) {
           hdr.dest_addr = KnxAddress.binToInd(KnxAddress.Uint8ArrToUint16Addr(hdr.dest_addr))
-        } else {
-          hdr.dest_addr = KnxAddress.binToStrGrpL3(KnxAddress.Uint8ArrToUint16Addr(hdr.dest_addr))
         }
 
         switch (hdr.msgcode) {
@@ -675,25 +675,32 @@ KnxProtocol.define('CEMI', {
       return
     }
 
-    // This function is used to validate value.src_addr and value.dest_addr
-    const validateSrcAndDest = (src, dest) => {
+    // This functions are used to validate value.src_addr and value.dest_addr
+    const validateSrcStr = src => {
       let retVal = 0
       if (KnxAddress.validateAddrStr(src) === -1) {
         this.error = Error(util.format('Invalid KNX source address (%j)!', src))
         retVal = 1
-      } else if (KnxAddress.validateAddrStr(dest) === -1) {
-        this.error = Error(util.format('Invalid KNX destination address (%j)!', dest))
-        retVal = 1
       } else if (KnxAddress.getAddrType(src) !== KnxConstants.KNX_ADDR_TYPES.DEVICE) {
         this.error = Error(util.format('KNX source address should be a device address (%j)!', src))
-        retVal = 1
-      } else if (KnxAddress.getAddrType(dest) !== value.ctrl.destAddrType) {
-        this.error = Error(util.format('KNX destination address should be a %s address (%j)!',
-          value.ctrl.destAddrType === KnxConstants.KNX_ADDR_TYPES.DEVICE ? 'device' : 'group', dest))
         retVal = 1
       }
 
       // Return retVal
+      return retVal
+    }
+
+    const validateDestStr = dest => {
+      let retVal = 0
+      if (KnxAddress.validateAddrStr(dest) === -1) {
+        this.error = Error(util.format('Invalid KNX source address (%j)!', dest))
+        retVal = 1
+      } else if (KnxAddress.getAddrType(dest) !== value.ctrl.destAddrType) {
+        this.error = Error(util.format('KNX destination address () should be a %s address (%j)!',
+          value.ctrl.destAddrType === KnxConstants.KNX_ADDR_TYPES.DEVICE ? 'device' : 'group', dest))
+        retVal = 1
+      }
+
       return retVal
     }
 
@@ -711,20 +718,76 @@ KnxProtocol.define('CEMI', {
             value.ctrl.hopCount * 0x10 +
             value.ctrl.extendedFrame
 
-    // Validate the KNX source and destination address
-    if (validateSrcAndDest(value.src_addr, value.dest_addr)) {
-      // null out this.buffer and return
+    let srcAddr
+    let destAddr
+
+    // Check the type of value.src_addr and value.dest_addr an assume that they have the same type
+    if (value.hasOwnProperty('src_addr') && value.hasOwnProperty('dest_addr')) {
+      switch (value.src_addr.constructor) {
+        case (String):
+          // Validate the KNX source address string
+          if (validateSrcStr(value.src_addr)) {
+            // Error already set by validateSrcStr()
+            this.buffer = null
+            return
+          }
+
+          // Calculate the source address value
+          srcAddr = KnxAddress.Uint16AddrToUint8Arr(KnxAddress.strToBin(value.src_addr))
+          break
+        case (Array):
+        case (Buffer):
+        case (Uint8Array):
+          // The source address is already in an usable format
+          srcAddr = value.src_addr
+          break
+        case (Uint16Array):
+          // Convert the Uint16Array into an Uint8Array
+          srcAddr = KnxAddress.Uint16AddrToUint8Arr(value.src_addr)
+          break
+        case (Number):
+        default:
+          // Just assume that the given value can be converted to and used as an Uint8Array
+          srcAddr = Uint8Array.from(value.src_addr)
+      }
+
+      switch (value.dest_addr.constructor) {
+        case (String):
+          // Validate the KNX destination address string
+          if (validateDestStr(value.dest_addr)) {
+            // Error already set by validateDestStr()
+            this.buffer = null
+            return
+          }
+
+          // Calculate the destination address value
+          destAddr = KnxAddress.Uint16AddrToUint8Arr(KnxAddress.strToBin(value.dest_addr))
+          break
+        case (Array):
+        case (Buffer):
+        case (Uint8Array):
+          // The destination address is already in an usable format
+          destAddr = value.dest_addr
+          break
+        case (Uint16Array):
+          // Convert the Uint16Array into an Uint8Array
+          destAddr = KnxAddress.Uint16AddrToUint8Arr(value.dest_addr)
+          break
+        case (Number):
+        default:
+          // Just assume that the given value can be converted to and used as an Uint8Array
+          srcAddr = Uint8Array.from(value.dest_addr)
+      }
+    } else {
+      this.error = Error('Both the source and destination address must be defined!')
       this.buffer = null
       return
     }
 
-    // Calculate the address values
-    const srcAddr = KnxAddress.Uint16AddrToUint8Arr(KnxAddress.strToBin(value.src_addr)[0])
-    const destAddr = KnxAddress.Uint16AddrToUint8Arr(KnxAddress.strToBin(value.dest_addr)[0])
-
-    // Check if the calculation succeeded
+    // Check if both the source and the destination address are set
     if (!(srcAddr !== null && destAddr !== null)) {
-      console.log(this)
+      this.error = Error(util.format('The destination (%j) or the source (%j) address is invalid!',
+        value.dest_addr, value.src_addr))
       this.buffer = null
       return
     }
