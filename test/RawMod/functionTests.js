@@ -6,18 +6,23 @@ import KnxAddressTest from './KnxAddressTest'
 import util from 'util'
 import fs from 'fs'
 
-const LOGFILE = './functionTestsError.log'
+const LOGFILE = './functionTests.log'
 
 // This function call all testing functions
-const runTests = async () => {
+const runTests = async (fd) => {
   let totalFailedTests = 0
   let totalGoodTests = 0
   let totalTestsRun = 0
-  let fd
 
-  // This opens the logfile
-  console.log('Opening logfile to log errors to: %s/%s', __dirname, LOGFILE)
-  fd = fs.openSync(LOGFILE, 'w')
+  // Write the test-starting information into the logfile
+  let bufStr = ''
+
+  bufStr += '\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+  bufStr += util.format('Starting test at: %s\n', Date())
+
+  let buf = Buffer.from(bufStr)
+
+  fs.writeSync(fd, buf, 0, buf.length, null)
 
   // This function adds the results returned by functions to the total values (above)
   const handleResults = (results) => {
@@ -30,9 +35,9 @@ const runTests = async () => {
     if (results.failedTests > 0) {
       // Prepare the text to be written into the file
       let bufStr = ''
-      bufStr += '====================\n'
-      bufStr += util.format('Function: %s\n\n', results.targetFunctionStr)
-      bufStr += '--------------------\n'
+
+      bufStr += '\n--------------------\n'
+      bufStr += util.format('Function: %s\n', results.targetFunctionStr)
       for (let failPair of results.failPairs) {
         for (let i = 0, len = failPair.input.length; i < len; i++) {
           bufStr += util.format('Input[%d]: %j\n', i, failPair.input[i])
@@ -41,17 +46,12 @@ const runTests = async () => {
         bufStr += util.format('Expected: %j\n', failPair.expected)
         bufStr += '--------------------\n'
       }
-      bufStr += '====================\n\n'
 
       // Initialize the buffer
       const buf = Buffer.from(bufStr)
 
       // Write it
-      fs.write(fd, buf, 0, buf.length, null, err => {
-        if (err) {
-          throw util.format('Error writing errors to file! (%s) ', LOGFILE)
-        }
-      })
+      fs.writeSync(fd, buf, 0, buf.length, 0)
     }
   }
 
@@ -85,8 +85,32 @@ const runTests = async () => {
   console.log('################################################################################')
   console.log('--------------------------------------------------------------------------------')
 
+  // Write final results into the logfile
+  bufStr = ''
+
+  bufStr += '############################### Final -- Results ###############################\n'
+  bufStr += util.format('Tests.run...: %d\n', totalTestsRun)
+  bufStr += util.format('Good.tests..: %d (~ %d%)\n', totalGoodTests, ((totalGoodTests / totalTestsRun) * 100).toPrecision(4))
+  bufStr += util.format('Failed.tests: %d (~ %d%)\n', totalFailedTests, ((totalFailedTests / totalTestsRun) * 100).toPrecision(4))
+  if (totalFailedTests > 0) {
+    bufStr += 'Status......: ERROR\n'
+  } else {
+    bufStr += 'Status......: GOOD\n'
+  }
+  bufStr += '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+
+  buf = Buffer.from(bufStr)
+
+  fs.writeSync(fd, buf, 0, buf.length, 0)
+
   // Close the logfile
   fs.closeSync(fd)
 }
 
-runTests()
+let fd
+
+// This opens the logfile
+console.log('Opening logfile to log errors to: %s/%s', __dirname, LOGFILE)
+fd = fs.openSync(LOGFILE, 'a+')
+
+runTests(fd).finally()
