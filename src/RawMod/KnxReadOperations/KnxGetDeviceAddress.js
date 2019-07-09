@@ -7,6 +7,7 @@ import KnxMessageTemplates from '../KnxMessageTemplates'
 import KnxNetProtocol from '../KnxNetProtocol'
 import RawModCustomMsgHandlers from '../CustomMsgHandlers'
 import KnxConstants from '../../KnxConstants'
+import KnxAddress from '../KnxAddress'
 
 export default {
   /*
@@ -137,7 +138,7 @@ export default {
          */
         RawModCustomMsgHandlers.registerCustomMsgHandler({
           cemi: {
-            dest_addr: KnxConstants.KNX_BROADCAST_ADDR,
+            dest_addr: KnxAddress.strToBin(KnxConstants.KNX_BROADCAST_ADDR),
             apdu: {
               apci: 'PhysicalAddress_Response'
             }
@@ -149,7 +150,7 @@ export default {
       const removeHandlers = () => {
         RawModCustomMsgHandlers.removeCustomMsgHandler({
           cemi: {
-            dest_addr: KnxConstants.KNX_BROADCAST_ADDR,
+            dest_addr: KnxAddress.strToBin(KnxConstants.KNX_BROADCAST_ADDR),
             apdu: {
               apci: 'PhysicalAddress_Response'
             }
