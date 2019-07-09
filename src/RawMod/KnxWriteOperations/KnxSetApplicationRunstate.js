@@ -71,7 +71,7 @@ export default {
         address = KnxConstants.KNX_MEMORY_ADDRS.MEMORY_LOADSTATE_APP2_ADDR
       } else {
         const err = new Error(RawModErrors.INVALID_ARGVAL.errorMsg)
-        const rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGVAL)
+        const rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGVAL.errorID)
 
         errContext.addNewError(rawModErr)
 

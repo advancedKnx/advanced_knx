@@ -33,6 +33,7 @@ const RawModErrors = {
   },
   INVALID_ARGVAL: {
     errorID: 0x3 + (0x1 << 16), // 65539
+    errorMsg: ErrorMessages.INVALID_ARGVAL
   },
   INVALID_DATALEN: {
     errorID: 0x3 + (0x1 << 16), // 65540
