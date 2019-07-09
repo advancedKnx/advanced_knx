@@ -29,7 +29,7 @@ const KnxMessageTemplates = {
     ctrl: {
       frameType: 1,
       repeat: 0,
-      broadcast: 0,
+      broadcast: 1,
       priority: KnxConstants.KNX_MSG_PRIORITY.SYSTEM,
       acknowledge: 0,
       confirm: 0,
@@ -127,7 +127,7 @@ const KnxMessageTemplates = {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
 
     retVal.ctrl.broadcast = 1
-    retVal.ctrl.destAddrType = 1
+    retVal.ctrl.destAddrType = KnxConstants.KNX_ADDR_TYPES.GROUP
     retVal.dest_addr = KnxConstants.KNX_BROADCAST_ADDR
     retVal.apdu.apci = 'PhysicalAddress_Read'
     retVal.apdu.noData = 1
@@ -140,7 +140,7 @@ const KnxMessageTemplates = {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
 
     retVal.ctrl.broadcast = 1
-    retVal.ctrl.destAddrType = 1
+    retVal.ctrl.destAddrType = KnxConstants.KNX_ADDR_TYPES.GROUP
     retVal.dest_addr = KnxConstants.KNX_BROADCAST_ADDR
     retVal.apdu.data = newDevAddr
     retVal.apdu.apci = 'PhysicalAddress_Write'
@@ -161,7 +161,7 @@ const KnxMessageTemplates = {
     return retVal
   },
 
-  // This funciton can be used to craft a property value write request - unicast
+  // This function can be used to craft a property value write request - unicast
   propertyValueWriteRequest: (destAddr, srcAddr, objectIndex, propertyID, elementCount, startIndex, data) => {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
 
@@ -170,6 +170,19 @@ const KnxMessageTemplates = {
     retVal.apdu.apci = 'PropertyValue_Write'
     retVal.apdu.tpci = KnxConstants.KNX_TPCI_TYPES.TPCI_NDP >> 2
     retVal.apdu.data = Buffer.from([objectIndex, propertyID, ((elementCount & 0b1111) << 4) | (startIndex >> 8) & 0b1111, startIndex & 0b11111111].concat(Array.from(data)))
+
+    return retVal
+  },
+
+  // This function can be used to craft a device restart request - unicats
+  deviceRestartRequest: (destAddr, srcAddr) => {
+    const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
+
+    retVal.src_addr = srcAddr
+    retVal.dest_addr = destAddr
+    retVal.apdu.apci = 'Restart'
+    retVal.apdu.tpci = KnxConstants.KNX_TPCI_TYPES.TPCI_NDP >> 2
+    retVal.apdu.noData = 1
 
     return retVal
   }
