@@ -25,6 +25,7 @@ import KnxReadGroupAddrTblLoadstate from './KnxReadOperations/KnxReadGroupAddrTb
 import KnxReadGroupAssociationTblLoadstate from './KnxReadOperations/KnxReadGroupAssociationTblLoadstate'
 import KnxReadManufacturerID from './KnxReadOperations/KnxReadManufacturerID'
 import KnxReadDeviceADC from './KnxReadOperations/KnxReadDeviceADC'
+import KnxRestartDevice from './KnxSpecialOperations/KnxRestartDevice'
 
 // The RawMod class - providing useful definitions and functions
 export default class RawMod {
@@ -71,5 +72,6 @@ export default class RawMod {
     this.KnxReadGroupAssociationTblLoadState = KnxReadGroupAssociationTblLoadstate
     this.KnxReadManufacturerID = KnxReadManufacturerID
     this.KnxReadDeviceADC = KnxReadDeviceADC
+    this.KnxRestartDevice = KnxRestartDevice
   }
 }

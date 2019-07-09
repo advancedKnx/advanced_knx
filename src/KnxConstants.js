@@ -242,7 +242,7 @@ KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
     propertyID: 0x05,
     elementCount: 0x01,
     startIndex: 0x01
-  },
+  }
 }
 
 // Different KNX device application runstates
