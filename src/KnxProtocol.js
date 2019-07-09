@@ -439,25 +439,27 @@ KnxProtocol.define('APDU', {
             hdr.data = hdr.apdu_raw.slice(2)
           } else {
             hdr.apci = KnxConstants.keyText(KnxConstants.APCICODES, apdu.apci * 0x40)
-            /*
-             * As said above all messages with APCI codes below KnxConstants.APCICODES.Memory_Read have data contained in the APCI field
-             * Except GroupValue_(Read|Write|Response) - These only contain data in the APCI field if nothing follows the APCI field
-             * All other can have data inside the APCI field and following it at the same time
-             */
-            if ((KnxConstants.APCICODES.GroupValue_Read <= apdu.apci * 0x40) && (apdu.apci * 0x40 <= KnxConstants.APCICODES.GroupValue_Write)) {
-              if (hdr.apdu_length <= 1) {
-                // Use only in-apci-data
-                hdr.data = Buffer.from([apdu.data])
+
+            // PhysicalAddress_Response messages do not carry any data at all
+            if (apdu.apci * 0x40 !== KnxConstants.APCICODES.PhysicalAddress_Response) {
+              /*
+               * As said above all messages with APCI codes below KnxConstants.APCICODES.Memory_Read have data contained in the APCI field
+               * Except GroupValue_(Read|Write|Response) - These only contain data in the APCI field if nothing follows the APCI field
+               * All other can have data inside the APCI field and following it at the same time
+               */
+              if ((KnxConstants.APCICODES.GroupValue_Read <= apdu.apci * 0x40) && (apdu.apci * 0x40 <= KnxConstants.APCICODES.GroupValue_Write)) {
+                if (hdr.apdu_length <= 1) {
+                  // Use only in-apci-data
+                  hdr.data = Buffer.from([apdu.data])
+                } else {
+                  // Use only following data
+                  hdr.data = hdr.apdu_raw.slice(2)
+                }
               } else {
-                // Use only following data
-                hdr.data = hdr.apdu_raw.slice(2)
+                // Use in-apci-data and following data
+                hdr.data = Buffer.concat([Buffer.from([apdu.data]), hdr.apdu_raw.slice(2)])
               }
-            } else {
-              // Use in-apci-data and following data
-              hdr.data = Buffer.concat([Buffer.from([apdu.data]), hdr.apdu_raw.slice(2)])
             }
-            // Get the corresponding name for the apci code and extract the data
-            // hdr.data = (hdr.apdu_length > 1) ? hdr.apdu_raw.slice(2) : Buffer.from([apdu.data])
           }
 
           // Check if the apci code is known
@@ -552,9 +554,12 @@ KnxProtocol.define('APDU', {
 
       this.UInt16BE(word)
 
-      // payload follows TPCI+APCI word
-      // KnxLog.get().trace('~~~%s, %j, %d', typeof value.data, value.data, total_length);
-      this.raw(Buffer.from(value.data, totalLength - 3))
+      // Check if there is explicitly not data
+      if (!value.noData) {
+        // payload follows TPCI+APCI word
+        // KnxLog.get().trace('~~~%s, %j, %d', typeof value.data, value.data, total_length);
+        this.raw(Buffer.from(value.data, totalLength - 3))
+      }
     }
   }
 })
