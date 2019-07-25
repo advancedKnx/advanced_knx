@@ -3,6 +3,8 @@
 * (C) 2016-2018 Elias Karakoulakis
 */
 
+import KnxDeviceResources from './RawMod/KnxDeviceResources'
+
 // SOURCES:
 // http://www.eb-systeme.de/?page_id=479
 // http://knxnetipdissect.sourceforge.net/doc.html
@@ -167,6 +169,9 @@ KnxConstants.KNX_TPCI_SUBTYPES = {
   TPCI_NCD_ACK: 0b00000010, // NCD acknowledge message
   TPCI_NCD_NACK: 0b00000011 // NCD not-acknowledge message
 }
+
+// Information about KNX device resources (memory addresses and property IDs + data lengths)
+KnxConstants.KNX_DEV_RESOURCES = KnxDeviceResources
 
 // Memory addresses useful when reading/writing data directly from/to a KNX device
 KnxConstants.KNX_MEMORY_ADDRS = {
