@@ -1,6 +1,6 @@
-/**************************************************************************
- * This file contains function and definitions to work with knx addresses *
- **************************************************************************/
+/***************************************************************************
+ * This file contains functions and definitions to work with knx addresses *
+ ***************************************************************************/
 
 import KnxConstants from '../KnxConstants'
 
