@@ -23,14 +23,14 @@ export default {
    *                      Type: String
 
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
-   *                      Type: require('Connection.js').Connection()
+   *                      Type: require('advanced_knx').Connection()
    *
    *      errContext      The RawMod error context - needed to indicate errors
-   *                      Type: require('RawMod/RawModErrorHandler.js').RawModErrorHandler()
+   *                      Type: require('advanced_knx').RawMod.errorHandler
    *
    * Return:
    *      Returns a promise which resolves with zero on success and with one if something went wrong
-   *      If the second is the case, a error will be added to errContext.errorStack
+   *      If the second is the case, an error will be added to errContext.errorStack
    *      Type: Promise
    *
    * Errors:

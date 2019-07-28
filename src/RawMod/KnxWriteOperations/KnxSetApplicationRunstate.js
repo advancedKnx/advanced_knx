@@ -47,7 +47,7 @@ export default {
    *
    * Return:
    *      Returns a promise which resolves with zero on success and with one if something went wrong
-   *      If the second is the case, a error will be added to errContext.errorStack
+   *      If the second is the case, an error will be added to errContext.errorStack
    *      Type: Promise
    *
    * Errors:
