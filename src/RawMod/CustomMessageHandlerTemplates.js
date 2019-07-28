@@ -54,6 +54,17 @@ const CustomMessageHandlerTemplates = {
       }
     }
   },
+  devDescrResponseTemplate: (sender, receiver) => {
+    return {
+      cemi: {
+        src_addr: sender,
+        dest_addr: receiver,
+        apdu: {
+          apci: 'DeviceDescriptor_Response'
+        }
+      }
+    }
+  },
   propertyValueResponseTemplate: (sender, receiver) => {
     return {
       cemi: {

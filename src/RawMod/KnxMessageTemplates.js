@@ -122,6 +122,19 @@ const KnxMessageTemplates = {
     return retVal
   },
 
+  // This function can be used to craft a device descriptor read request - unicast
+  devDescrReadRequest: (destAddr, srcAddr, channel, count) => {
+    const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)
+
+    retVal.dest_addr = destAddr
+    retVal.src_addr = srcAddr
+    retVal.apdu.apci = 'DeviceDescriptor_Read'
+    retVal.apdu.tpci = KnxConstants.KNX_TPCI_TYPES.TPCI_NDP >> 2
+    retVal.apdu.noData = 1
+
+    return retVal
+  },
+
   // This function can be used to craft a physical address read request - broadcast
   physicalAddressReadRequest: () => {
     const retVal = copyJsonWithoutRef(KnxMessageTemplates.generalTemplate)

@@ -50,10 +50,10 @@ export default {
    *                      Type: Integer
    *
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
-   *                      Type: require('Connection.js').Connection()
+   *                      Type: require('advanced_knx').Connection()
    *
    *      errContext      The RawMod error context - needed to indicate errors
-   *                      Type: require('RawMod/RawModErrorHandler.js').RawModErrorHandler()
+   *                      Type: require('advanced_knx').RawMod.errorHandler
    *
    * Return:
    *      Returns a promise which resolves with the following JSON object:
@@ -82,7 +82,7 @@ export default {
    *          data: null
    *        }
    *
-   *      If the second is the case, a error will be added to errContext.errorStack
+   *      If the second is the case, an error will be added to errContext.errorStack
    *      Type: Promise
    *
    * Errors:

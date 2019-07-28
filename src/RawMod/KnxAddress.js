@@ -61,7 +61,7 @@ export default class KnxAddress {
    *
    * Errors:
    *
-   *      Every return value differing from one and two is a error, caused by invalid input
+   *      Every return value differing from one and two is an error, caused by invalid input
    *      Use KnxAddress.validateAddrStr() to validate addresses
    */
   static grpAddrStrGetL (grpAddrStr) {

@@ -50,7 +50,7 @@ export default {
    *          data: null
    *        }
    *
-   *      If the second is the case, a error will be added to errContext.errorStack
+   *      If the second is the case, an error will be added to errContext.errorStack
    *      Type: Promise
    *
    * Errors:

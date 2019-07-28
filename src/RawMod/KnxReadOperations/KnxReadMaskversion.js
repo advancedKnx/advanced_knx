@@ -1,6 +1,6 @@
-/*****************************************************************
- * This file contains a function to read a KNX devices ADC value *
- *****************************************************************/
+/*******************************************************************
+ * This file contains a function to read a KNX devices maskversion *
+ *******************************************************************/
 
 import KnxMessageTemplates from '../KnxMessageTemplates'
 import KnxNetProtocol from '../KnxNetProtocol'
@@ -12,12 +12,13 @@ import KnxConstants from '../../KnxConstants'
 
 export default {
   /*
-   * Function: KnxReadDeviceADC.readDeviceADC()
+   * Function: KnxReadMaskversion.readMaskversion()
    *
-   *      This function reads a KNX devices ADC value of an specific channel
-   *      (The sum of a specific number of A to D conversions)
-   *
-   *
+   *      (The maskversion is also called 'Device Descriptor')
+   *      This function reads a KNX devices maskversion
+   *      The maskversion of a KNX device can be used to determine which resources it provides and how to access them
+   *      (Resources, for example: The programming mode flag, the application load and runstates, ...)
+   *      The resource information in relation to the corresponding maskversions are stored in KnxDeviceResourceInformation.js
    *
    * Arguments:
    *
@@ -28,13 +29,6 @@ export default {
    *                      Note that this option should be set to null most of the time
    *                      E.g.: 2.3.4, 11.13.26 or null, ...
    *                      Type: String/null
-   *
-   *      channel         Channel number of the AD-converter
-   *                      Type: Number
-   *
-   *      readCount       Number of consecutive reads of the AD-converters value
-   *                      E.g.: 1, 4, 6, 8, ...
-   *                      Type: Number
    *
    *      recvTimeout     Specifies how long to wait for an acknowledge message from the KNX device (in milliseconds)
    *                      Recommended to be around 2000 and should be raised to higher values when errors with the following
@@ -60,10 +54,10 @@ export default {
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x01, 0x08, 0x00, 0x00])
+   *          data: Buffer.from([0x07, 0x01])
    *        }
    *
-   *      The first byte being the channel. The second byte being the count. The last two bytes being the ADC data
+   *      Being the maskversion (represented as number) of the target device
    *
    *      On error, error will be set to one and data will be null
    *
@@ -84,11 +78,11 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readDeviceADC: async (target, source, channel, readCount, recvTimeout, conContext, errContext) => {
+  readMaskversion: async (target, source, recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      Send a UCD connection request to the target device
-     *      Send a adc read request
+     *      Send a device descriptor read request
      *      (The device should send the requested data, wait for it)
      *      Send a NCD acknowledge message back to the device
      *      Send a UCD disconnect request
@@ -99,11 +93,11 @@ export default {
       let err
       let rawModErr
       let connReq
-      let adcReadReq
+      let devDescrReadReq
       let ackMsg
       let dconnMsg
       let timeoutRef
-      let adcresponseHandlerTemplate
+      let devDescrResponseHandlerTemplate
 
       // This function validates the arguments
       const checkArguments = () => {
@@ -115,7 +109,7 @@ export default {
           }
 
           // Check if all the other parameters are defined
-          if ((target == null) || (channel == null) || (readCount == null) || (recvTimeout == null) || (conContext == null)) {
+          if ((target == null) || (recvTimeout == null) || (conContext == null)) {
             err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
             rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS)
 
@@ -127,8 +121,7 @@ export default {
 
         // Check if all arguments have the correct type
         const checkArgumentTypes = () => {
-          if ((target.constructor !== String) || ((source != null) ? source.constructor !== String : false) ||
-            (channel.constructor !== Number) || (readCount.constructor !== Number) || (recvTimeout.constructor !== Number)) {
+          if ((target.constructor !== String) || ((source != null) ? source.constructor !== String : false) || (recvTimeout.constructor !== Number)) {
             err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
             rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
@@ -179,18 +172,18 @@ export default {
       // This function forges all the needed messages
       const forgeMessages = () => {
         connReq = KnxMessageTemplates.ucdConnRequest(target, source)
-        adcReadReq = KnxMessageTemplates.adcReadRequest(target, source, channel, readCount)
+        devDescrReadReq = KnxMessageTemplates.devDescrReadRequest(target, source)
         ackMsg = KnxMessageTemplates.ncdAckMsg(target, source)
         dconnMsg = KnxMessageTemplates.ucdDconnMsg(target, source)
       }
 
       // This function prepares the custom message handler templates
       const prepareCustomMessageHandlerTemplates = () => {
-        adcresponseHandlerTemplate = RawModCustomMsgHandlerTemplates.adcResponseTemplate(target, source || conContext.options.physAddr)
+        devDescrResponseHandlerTemplate = RawModCustomMsgHandlerTemplates.devDescrResponseTemplate(target, source || conContext.options.physAddr)
       }
 
-      // A handler for the ADCResponse (Contains the 'everything-went-right' exit point)
-      const adcResponseHandler = rawMsgJson => {
+      // A handler for the DevDescrResponse (Contains the 'everything-went-right' exit point)
+      const devDescrResponseHandler = rawMsgJson => {
         // Check if timeoutRef is null (=> if the handler was already called once)
         if (timeoutRef == null) {
           return
@@ -231,22 +224,22 @@ export default {
         })
       }
 
-      // This function registers 'adcResponseHandler'
+      // This function registers 'devDescrResponseHandler'
       const registerHandler = () => {
         /*
          * Register a handler that catches the adc response message from the device
          * This message should arrive in any case - even if the request failed
          *  In that case, it simply won't contain any data
          */
-        RawModCustomMsgHandlers.registerCustomMsgHandler(adcresponseHandlerTemplate, adcResponseHandler, conContext)
+        RawModCustomMsgHandlers.registerCustomMsgHandler(devDescrResponseHandlerTemplate, devDescrResponseHandler, conContext)
       }
 
       // This function is later used to remove handlers registered below
       const removeHandlers = () => {
-        RawModCustomMsgHandlers.removeCustomMsgHandler(adcresponseHandlerTemplate, conContext)
+        RawModCustomMsgHandlers.removeCustomMsgHandler(devDescrResponseHandlerTemplate, conContext)
       }
 
-      // This function sends 'connReq' and 'memReadReq' to 'target'
+      // This function sends 'connReq' and 'devDescrReadReq' to 'target'
       const sendConnAndReadReq = () => {
         return new Promise(resolve => {
           // Send the UCD connection request
@@ -262,8 +255,8 @@ export default {
               // Return 1
               resolve(1)
             } else {
-              // Send the adc read request
-              KnxNetProtocol.sendTunnRequest(adcReadReq, conContext, sendErr => {
+              // Send the dev descr read request
+              KnxNetProtocol.sendTunnRequest(devDescrReadReq, conContext, sendErr => {
                 // Check for errors
                 if (sendErr) {
                   // Create the RawModError object
