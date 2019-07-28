@@ -3,7 +3,7 @@
 * (C) 2016-2018 Elias Karakoulakis
 */
 
-import KnxDeviceResources from './RawMod/KnxDeviceResources'
+import KnxDeviceResourceInformation from './RawMod/KnxDeviceResourceInformation'
 
 // SOURCES:
 // http://www.eb-systeme.de/?page_id=479
@@ -171,7 +171,7 @@ KnxConstants.KNX_TPCI_SUBTYPES = {
 }
 
 // Information about KNX device resources (memory addresses and property IDs + data lengths)
-KnxConstants.KNX_DEV_RESOURCES = KnxDeviceResources
+KnxConstants.KNX_DEV_RESOURCE_INFORMATION = KnxDeviceResourceInformation
 
 // Memory addresses useful when reading/writing data directly from/to a KNX device
 KnxConstants.KNX_MEMORY_ADDRS = {

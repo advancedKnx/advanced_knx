@@ -2,7 +2,7 @@
  * This file contains information about resources that can be read/written from/to KNX devices based on their maskversion
  */
 
-const KnxDeviceResources = {
+const KnxDeviceResourceInformation = {
   resources: [
     { maskVersionStr: '0001',
       maskVersion: 1,
@@ -5962,14 +5962,14 @@ const KnxDeviceResources = {
     }
   ],
   getResourceByMaskVersion: maskVersion => {
-    return KnxDeviceResources.resources.filter(resource => {
+    return KnxDeviceResourceInformation.resources.filter(resource => {
       if (resource.maskVersion === maskVersion) {
         return resource
       }
     })[0]
   },
   getResourceByMaskVersionStr: maskVersionStr => {
-    return KnxDeviceResources.resources.filter(resource => {
+    return KnxDeviceResourceInformation.resources.filter(resource => {
       if (resource.maskVersionStr === maskVersionStr) {
         return resource
       }
@@ -5977,4 +5977,4 @@ const KnxDeviceResources = {
   }
 }
 
-export default KnxDeviceResources
+export default KnxDeviceResourceInformation
