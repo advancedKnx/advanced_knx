@@ -3,6 +3,46 @@
  */
 
 const KnxDeviceResourceInformation = {
+  /** Functions to help working with the data below **/
+  __getResourceInfoSetByMaskVersion: maskVersion => {
+    return KnxDeviceResourceInformation.resources.filter(resources => {
+      if (resources.maskVersion === maskVersion) {
+        return resources
+      }
+    })[0]
+  },
+  __getResourceInfoSetByMaskVersionStr: maskVersionStr => {
+    return KnxDeviceResourceInformation.resources.filter(resources => {
+      if (resources.maskVersionStr === maskVersionStr) {
+        return resources
+      }
+    })[0]
+  },
+  getResourceInfoByMaskVersionAndName: (maskVersion, resourceName) => {
+    let resources
+
+    // Check whether maskVersion is a string or a number and call the fitting function to get the maskversions resources
+    if (typeof maskVersion === 'number') {
+      KnxDeviceResourceInformation.__getResourceInfoSetByMaskVersion(maskVersion)
+    } else if (typeof maskVersion === 'string') {
+      KnxDeviceResourceInformation.__getResourceInfoSetByMaskVersionStr(maskVersion)
+    }
+
+    // Filter out the correct resource
+    if (resources) {
+      return resources.filter(resource => {
+        if (resource.name === resourceName) {
+          return resource
+        }
+      })[0]
+    }
+  },
+  getResourceInfoByMaskVersionStrAndName: (maskVersionStr, resourceName) => {
+  // getResourceByMaskVersionAndName already covers the maskversion strings - redirect
+    return KnxDeviceResourceInformation.getResourceInfoByMaskVersionAndName(maskVersionStr, resourceName)
+  },
+
+  /** Information about device resources and how to access them - USE FUNCTIONS ABOVE INSTEAD OF DIRECT ACCESS **/
   resources: [
     { maskVersionStr: '0001',
       maskVersion: 1,
@@ -5960,21 +6000,7 @@ const KnxDeviceResourceInformation = {
       ],
       compatibleMaskVersionIDs: []
     }
-  ],
-  getResourceByMaskVersion: maskVersion => {
-    return KnxDeviceResourceInformation.resources.filter(resource => {
-      if (resource.maskVersion === maskVersion) {
-        return resource
-      }
-    })[0]
-  },
-  getResourceByMaskVersionStr: maskVersionStr => {
-    return KnxDeviceResourceInformation.resources.filter(resource => {
-      if (resource.maskVersionStr === maskVersionStr) {
-        return resource
-      }
-    })[0]
-  }
+  ]
 }
 
 export default KnxDeviceResourceInformation
