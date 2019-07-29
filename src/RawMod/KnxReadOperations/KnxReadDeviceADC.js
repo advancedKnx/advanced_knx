@@ -39,7 +39,7 @@ export default {
    *      recvTimeout     Specifies how long to wait for an acknowledge message from the KNX device (in milliseconds)
    *                      Recommended to be around 2000 and should be raised to higher values when errors with the following
    *                      errorIDs are occurring:
-   *                        65555 ('The target failed to respond!')
+   *                        65546 ('The target failed to respond!')
    *                      Type: Integer
    *
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
