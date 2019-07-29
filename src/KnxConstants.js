@@ -173,6 +173,12 @@ KnxConstants.KNX_TPCI_SUBTYPES = {
 // Information about KNX device resources (memory addresses and property IDs + data lengths)
 KnxConstants.KNX_DEV_RESOURCE_INFORMATION = KnxDeviceResourceInformation
 
+// The two types of reading a resource
+KnxConstants.RESOURCE_READ_TYPES = {
+  MEMORY_READ: 0x01,
+  PROPERTY_READ: 0x02
+}
+
 // Memory addresses useful when reading/writing data directly from/to a KNX device
 KnxConstants.KNX_MEMORY_ADDRS = {
   MEMORY_PROGMODE_ADDR: [0x00, 0x60], // Address of the progmode flag
