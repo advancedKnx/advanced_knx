@@ -133,10 +133,8 @@ export default {
       // Check which methods are available for this resource
       const checkAvailableReadMethods = () => {
         if (deviceResourceInformation.hasOwnProperty('startAddress')) {
-          // TODO test reading addressSpace 'Constant' (ResName = ManagementStyle) [memoryRead]
-          // TODO test reading addressSpace 'LcFilterMemory' (ResName = LcMode, GroupFilterTable) [memoryRead]
           /*
-           * 'StandardMemory' is readable
+           * 'StandardMemory', 'Constant' are readable
            */
           if (['StandardMemory', 'Constant'].lastIndexOf(deviceResourceInformation['addressSpace']) !== -1) {
             // Direct memory access possible
@@ -148,8 +146,6 @@ export default {
          * 'SystemProperty' is readable
          */
         if (deviceResourceInformation.hasOwnProperty('propertyID')) {
-          // TODO test reading addressSpace 'RelativeMemory' (ResName = GroupAssociationTable, GroupObjectTable, GroupAddressTable) [propertyRead]
-          // TODO test reading addressSpace 'RelativeMemoryByObjectType' (ResName = GroupFilterTable) [propertyRead]
           // Property access possible
           readViaPropertyAvailable = true
         }
