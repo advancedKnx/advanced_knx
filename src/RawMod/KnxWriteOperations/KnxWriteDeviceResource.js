@@ -7,6 +7,7 @@ import KnxConstants from '../../KnxConstants'
 import KnxDeviceResourceInformation from '../KnxDeviceResourceInformation'
 import __KnxWriteResourceViaMemory from './__KnxWriteResourceViaMemory'
 import __KnxWriteResourceViaProperty from './__KnxWriteResourceViaProperty'
+import RawModErrors from '../Errors'
 
 export default {
   /*
@@ -74,35 +75,22 @@ export default {
    *                          Type: require('advanced_knx').RawMod.errorHandler
    *
    * Return:
-   *
-   *      Returns a promise which resolves with the following JSON object:
-   *
-   *      {
-   *        error: x,
-   *        data: y
-   *      }
-   *
-   *      If everything goes well, error will be zero and data will be the response-data of the target device
-   *
-   *        {
-   *          error: 0,
-   *          data: Buffer.from([0x01, 0x08, 0x00, 0x00])
-   *        }
-   *
-   *      The first byte being the channel. The second byte being the count. The last two bytes being the ADC data
-   *
-   *      On error, error will be set to one and data will be null
-   *
-   *        {
-   *          error: 1,
-   *          data: null
-   *        }
-   *
+   *      Returns a promise which resolves with zero on success and with one if something went wrong
    *      If the second is the case, an error will be added to errContext.errorStack
    *      Type: Promise
    *
    * Errors:
    *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one arguments has an invalid type
+   *      RawModErrors.INVALID_DATALEN - The data argument has an invalid length
+   *      RawModErrors.TARGET_NOTACK- The target device did actively not acknowledge
+   *      RawModErrors.TIMEOUT_REACHED - The target device failed to respond in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
+   *
+   *      RawModErrors.INVALID_MV_RN - The maskversion or resource name is invalid
+   *      RawModErrors.NO_WRITE_WAY_FOUND - No way of writing the resource value found
+   *      RawModErrors.NO_WRITE_WAY_MATCHED - No available way of writing the resource fits the criteria (preferredReadType)
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
@@ -113,9 +101,11 @@ export default {
       let writeViaMemAccessAvailable = false
       let writeViaPropertyAvailable = false
       let writeMethodFunction
+      let rawModErr
+      let err
 
       // The value to be passed to resolve
-      let retVal
+      let retVal = 0
 
       /** Intern functions needed for the process **/
       // Get information about the resource associated with resourceNameStr
@@ -124,9 +114,10 @@ export default {
 
         // Check if anything was found
         if (!deviceResourceInformation) {
-          // TODO Error unknown maskversion (...)
-          console.error('UNKNOWN MASKVERSION OR RESOURCE NAME', deviceMaskversion)
-          retVal.error = true // RawMod error (...) ...
+          err = new Error(RawModErrors.INVALID_MV_RN.errorMsg)
+          rawModErr = errContext.createNewError(err, RawModErrors.INVALID_MV_RN.errorID)
+          retVal = errContext.addNewError(rawModErr)
+
           return 1
         }
       }
@@ -153,9 +144,10 @@ export default {
 
         // Check if any method is available
         if (!(writeViaMemAccessAvailable || writeViaPropertyAvailable)) {
-          // TODO Error no read-way available (...)
-          console.error(('NO WRITE_WAY AVAILABLE'))
-          retVal.error = true // RawMod error (...) ...
+          err = new Error(RawModErrors.NO_WRITE_WAY_FOUND)
+          rawModErr = errContext.createNewError(err, RawModErrors.NO_WRITE_WAY_FOUND.errorID)
+          retVal = errContext.addNewError(rawModErr)
+
           return 1
         }
       }
@@ -187,9 +179,10 @@ export default {
 
         // Check if any function was chosen
         if (!writeMethodFunction) {
-          // TODO no suitable write function found
-          console.error('NO SUITABLE WAY FOR WRITING THE RESOURCE FOUND')
-          retVal.error = true // RawMod Error (...) ...
+          err = new Error(RawModErrors.NO_WRITE_WAY_MATCHED.errorMsg)
+          rawModErr = errContext.createNewError(err, RawModErrors.NO_WRITE_WAY_MATCHED.errorID)
+          retVal = errContext.addNewError(rawModErr)
+
           return 1
         }
       }
