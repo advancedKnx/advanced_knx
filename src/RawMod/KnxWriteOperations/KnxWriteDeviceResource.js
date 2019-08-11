@@ -41,9 +41,9 @@ export default {
    *                          E.g.: 'DeviceManufacturerId', 'ApplicationId', 'ApplicationRunStatus', ...
    *                          Type: String
    *
-   *      preferredWriteType  The preferred way of reading the resource
-   *                          One of KnxConstants.RESOURCE_READ_TYPES.* or null/undefined for auto-chose
-   *                          Choosing the KnxConstants.RESOURCE_READ_TYPES.*_STRICT variant will lead the function to return an error
+   *      preferredWriteType  The preferred way of writing the resource value
+   *                          One of KnxConstants.RESOURCE_ACCESS_TYPES.* or null/undefined for auto-chose
+   *                          Choosing the KnxConstants.RESOURCE_ACCESS_TYPES.*_STRICT variant will lead the function to return an error
    *                          if the preferred way of access is not available
    *
    *                          NOTE that almost all resource can be accessed via direct memory access or property access
@@ -53,8 +53,8 @@ export default {
    *                          saving the value and then reading the whole memory of the device while searching for the value that was read via property access
    *                          But this method is very time-consuming and other devices, even with the same maskversion, may use other memory addresses etc.)
    *
-   *                          E.g.: KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ, KnxConstants.RESOURCE_READ_TYPES.PROPERTY_READ,
-   *                                KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ_STRICT, KnxConstants.RESOURCE_READ_TYPES.PROPERTY_READ_STRICT,
+   *                          E.g.: KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY, KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY,
+   *                                KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY_STRICT, KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY_STRICT,
    *                                undefined
    *                          Type: Number
    *
@@ -75,8 +75,9 @@ export default {
    *                          Type: require('advanced_knx').RawMod.errorHandler
    *
    * Return:
-   *      Returns a promise which resolves with zero on success and with one if something went wrong
+   *      Returns a promise which resolves with zero on success and with a number != 0 if something went wrong
    *      If the second is the case, an error will be added to errContext.errorStack
+   *      In this case, the returned number can be used to get the error from the errorStack
    *      Type: Promise
    *
    * Errors:
@@ -156,17 +157,17 @@ export default {
       const chooseWriteMethodFunction = () => {
         if (writeViaPropertyAvailable && writeViaMemAccessAvailable) {
           // Both are available - choose based on the preferred method
-          if (preferredReadType === KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ) {
+          if (preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY) {
             writeMethodFunction = __KnxWriteResourceViaMemory
           } else {
             writeMethodFunction = __KnxWriteResourceViaProperty
           }
         } else if (!writeViaMemAccessAvailable &&
-          preferredReadType === KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ_STRICT) {
+          preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY_STRICT) {
           // Using direct memory access forced but not possible - error
           writeMethodFunction = undefined
         } else if (!writeViaPropertyAvailable &&
-          preferredReadType === KnxConstants.RESOURCE_READ_TYPES.PROPERTY_READ_STRICT) {
+          preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY_STRICT) {
           // Using property access forced but not possible - error
           writeMethodFunction = undefined
         } else if (writeViaMemAccessAvailable) {

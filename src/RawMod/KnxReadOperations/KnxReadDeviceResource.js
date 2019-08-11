@@ -7,6 +7,7 @@ import KnxConstants from '../../KnxConstants'
 import KnxDeviceResourceInformation from '../KnxDeviceResourceInformation'
 import __KnxReadDeviceResourceViaMemory from './__KnxReadResourceViaMemory'
 import __KnxReadDeviceResourceViaProperty from './__KnxReadResourceViaProperty'
+import RawModErrors from '../Errors'
 
 export default {
   /*
@@ -41,8 +42,8 @@ export default {
    *                        Type: String
    *
    *      preferredReadType The preferred way of reading the resource
-   *                        One of KnxConstants.RESOURCE_READ_TYPES.* or null/undefined for auto-chose
-   *                        Choosing the KnxConstants.RESOURCE_READ_TYPES.*_STRICT variant will lead the function to return an error
+   *                        One of KnxConstants.RESOURCE_ACCESS_TYPES.* or null/undefined for auto-chose
+   *                        Choosing the KnxConstants.RESOURCE_ACCESS_TYPES.*_STRICT variant will lead the function to return an error
    *                        if the preferred way of access is not available
    *
    *                        NOTE that almost all resource can be accessed via direct memory access or property access
@@ -52,8 +53,8 @@ export default {
    *                        saving the value and then reading the whole memory of the device while searching for the value that was read via property access
    *                        But this method is very time-consuming and other devices, even with the same maskversion, may use other memory addresses etc.)
    *
-   *                        E.g.: KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ, KnxConstants.RESOURCE_READ_TYPES.PROPERTY_READ,
-   *                              KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ_STRICT, KnxConstants.RESOURCE_READ_TYPES.PROPERTY_READ_STRICT,
+   *                        E.g.: KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY, KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY,
+   *                              KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY_STRICT, KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY_STRICT,
    *                              undefined
    *                        Type: Number
    *
@@ -82,12 +83,13 @@ export default {
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x01, 0x08, 0x00, 0x00])
+   *          data: Buffer.from([0x00, 0x60, 0x01])
    *        }
    *
-   *      The first byte being the channel. The second byte being the count. The last two bytes being the ADC data
+   *      The first two bytes being the memory address, followed by n data bytes
+   *      The example shows a response a response containing data (0x01) read from 0x0060 (ProgrammingMode, in most cases)
    *
-   *      On error, error will be set to one and data will be null
+   *      On error, error will be set to a number != 0 and data will be null
    *
    *        {
    *          error: 1,
@@ -95,10 +97,21 @@ export default {
    *        }
    *
    *      If the second is the case, an error will be added to errContext.errorStack
+   *      Error will be set to the number of the error pushed onto the errorStack, it can be used to get the error
+   *      from the errorStack
    *      Type: Promise
    *
    * Errors:
    *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
+   *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
+   *      RawModErrors.INVALID_READLEN - The length argument has an invalid value
+   *      RawModErrors.TIMEOUT_REACHED - The target failed to response in recvTimeout ms
+   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
+   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
+   *
+   *      RawModErrors.INVALID_MV_RN - The maskversion or resource name is invalid
+   *      RawModErrors.NO_READ_WAY_FOUND - No way of writing the resource value found
+   *      RawModErrors.NO_READ_WAY_MATCHED - No available way of writing the resource fits the criteria (preferredReadType)
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
@@ -109,6 +122,8 @@ export default {
       let readViaMemAccessAvailable = false
       let readViaPropertyAvailable = false
       let readMethodFunction
+      let rawModErr
+      let err
 
       // The value to be passed to resolve
       let retVal = {
@@ -123,9 +138,10 @@ export default {
 
         // Check if anything was found
         if (!deviceResourceInformation) {
-          // TODO Error unknown maskversion (...)
-          console.error('UNKNOWN MASKVERSION OR RESOURCE NAME', deviceMaskversion)
-          retVal.error = true // RawMod error (...) ...
+          err = new Error(RawModErrors.INVALID_MV_RN.errorMsg)
+          rawModErr = errContext.createNewError(err, RawModErrors.INVALID_MV_RN.errorID)
+          retVal = errContext.addNewError(rawModErr)
+
           return 1
         }
       }
@@ -152,9 +168,10 @@ export default {
 
         // Check if any method is available
         if (!(readViaMemAccessAvailable || readViaPropertyAvailable)) {
-          // TODO Error no read-way available (...)
-          console.error(('NO READ_WAY AVAILABLE'))
-          retVal.error = true // RawMod error (...) ...
+          err = new Error(RawModErrors.NO_READ_WAY_FOUND.errorMsg)
+          rawModErr = errContext.createNewError(err, RawModErrors.NO_READ_WAY_FOUND.errorID)
+          retVal = errContext.addNewError(rawModErr)
+
           return 1
         }
       }
@@ -163,17 +180,17 @@ export default {
       const chooseReadMethodFunction = () => {
         if (readViaPropertyAvailable && readViaMemAccessAvailable) {
           // Both are available - choose based on the preferred method
-          if (preferredReadType === KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ) {
+          if (preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY) {
             readMethodFunction = __KnxReadDeviceResourceViaMemory
           } else {
             readMethodFunction = __KnxReadDeviceResourceViaProperty
           }
         } else if (!readViaMemAccessAvailable &&
-            preferredReadType === KnxConstants.RESOURCE_READ_TYPES.MEMORY_READ_STRICT) {
+            preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY_STRICT) {
           // Using direct memory access forced but not possible - error
           readMethodFunction = undefined
         } else if (!readViaPropertyAvailable &&
-            preferredReadType === KnxConstants.RESOURCE_READ_TYPES.PROPERTY_READ_STRICT) {
+            preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY_STRICT) {
           // Using property access forced but not possible - error
           readMethodFunction = undefined
         } else if (readViaMemAccessAvailable) {
@@ -186,9 +203,10 @@ export default {
 
         // Check if any function was chosen
         if (!readMethodFunction) {
-          // TODO no suitable read function found
-          console.error('NO SUITABLE WAY FOR READING THE RESOURCE FOUND')
-          retVal.error = true // RawMod Error (...) ...
+          err = new Error(RawModErrors.NO_READ_WAY_MATCHED.errorMsg)
+          rawModErr = errContext.createNewError(err, RawModErrors.NO_READ_WAY_MATCHED.errorID)
+          retVal = errContext.addNewError(rawModErr)
+
           return 1
         }
       }
