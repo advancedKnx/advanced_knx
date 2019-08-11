@@ -15,7 +15,13 @@ const ErrorMessages = {
   INVALID_NEWADDR: 'The new address is invalid!',
   TARGET_NOTACK: 'The target actively didn\'t acknowledge the request!',
   TIMEOUT_REACHED: 'The target failed to respond!',
-  INVALID_NEWADDRESS: 'The new KNX address is invalid!'
+  INVALID_NEWADDRESS: 'The new KNX address is invalid!',
+  // Errors for Knx[Write/Read]DeviceResource
+  INVALID_MV_RN: 'The maskversion or resource name is invalid!',
+  NO_WRITE_WAY_FOUND: 'No way to write the resource value found!',
+  NO_WRITE_WAY_MATCHED: 'No way to write the resource value matches the criteria!',
+  NO_READ_WAY_FOUND: 'No way to read the resource found!',
+  NO_READ_WAY_MATCHED: 'No way to read the resource matches the criteria!'
 }
 
 const RawModErrors = {
@@ -62,6 +68,26 @@ const RawModErrors = {
   TIMEOUT_REACHED: {
     errorID: 0xa + (0x1 << 16), // 65546
     errorMsg: ErrorMessages.TIMEOUT_REACHED
+  },
+  INVALID_MV_RN: {
+    errorID: 0xb + (0x1 << 16), // 65547
+    errorMsg: ErrorMessages.INVALID_MV_RN
+  },
+  NO_WRITE_WAY_FOUND: {
+    errorID: 0xc + (0x1 << 16), // 65548
+    errorMsg: ErrorMessages.NO_WRITE_WAY_FOUND
+  },
+  NO_WRITE_WAY_MATCHED: {
+    errorID: 0xd + (0x1 << 16), // 65559
+    errorMsg: ErrorMessages.NO_WRITE_WAY_MATCHED
+  },
+  NO_READ_WAY_FOUND: {
+    errorID: 0xe + (0x1 << 16), // 65550
+    errorMsg: ErrorMessages.NO_READ_WAY_FOUND
+  },
+  NO_READ_WAY_MATCHED: {
+    errorID: 0xf + (0x1 << 16), // 65551
+    errorMsg: ErrorMessages.NO_READ_WAY_MATCHED
   }
 }
 
