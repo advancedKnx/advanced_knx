@@ -124,10 +124,10 @@ export default {
             return 1
           }
 
-          // Check if all the other parameters are defined
-          if (!(target && recvTimeout && conContext)) {
+          // Check if all the other parameters are defined (object index not checked - can be zero)
+          if (!(target && recvTimeout && conContext && propertyID && startIndex && elementCount)) {
             err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS)
+            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS.errorID)
 
             errContext.addNewError(rawModErr)
 
