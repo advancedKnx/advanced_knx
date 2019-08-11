@@ -5,23 +5,25 @@
 import callerID from 'caller-id'
 
 export class RawModError {
-  constructor (filePath, functionName, time, errorObject, referenceID) {
+  constructor (filePath, functionName, time, errorObject, referenceID, errorNumber) {
     this.filePath = filePath // The file the error occurred in
     this.functionName = functionName // The function the error occurred in
     this.time = time // The time of the occurrence
     this.errorObject = errorObject // The new Error() object describing the error
     this.referenceID = referenceID // A error code identifying the error (RawModErrors.ERR_*.errorID)
+    this.errorNumber = errorNumber // The number (counter) of the error
   }
 }
 
 export default class RawModErrorHandler {
   constructor () {
     // A array of RawModError objects
+    this.errorCounter = 1
     this.errorStack = []
   }
 
   /*
-   * Function:  RawModError.getLastError()
+   * Function:  RawModErrorHandler.getLastError()
    *
    *      Returns the last (most recent) error from this.errorStack
    */
@@ -30,7 +32,20 @@ export default class RawModErrorHandler {
   }
 
   /*
-   * Function:  RawModError.getErrorStack()
+   * Function:  RawModErrorHandler.getErrorByNumber
+   *
+   *      Returns the error with errorNumber eq. number
+   */
+  getErrorByNumber (number) {
+    return this.getErrorStack().filter(e => {
+      if (e.errorNumber === number) {
+        return e
+      }
+    })[0]
+  }
+
+  /*
+   * Function:  RawModErrorHandler.getErrorStack()
    *
    *      Returns the whole this.errorStack
    */
@@ -39,7 +54,7 @@ export default class RawModErrorHandler {
   }
 
   /*
-   * Function:  RawModError.delLastError()
+   * Function:  RawModErrorHandler.delLastError()
    *
    *      Deletes the last (most recent) error from this.errorStack
    */
@@ -48,7 +63,7 @@ export default class RawModErrorHandler {
   }
 
   /*
-   * Function:  RawModError.delErrorStack()
+   * Function:  RawModErrorHandler.delErrorStack()
    *
    *      Clears the whole this.errorStack
    */
@@ -57,7 +72,7 @@ export default class RawModErrorHandler {
   }
 
   /*
-   * Function:  RawModError.addNewError()
+   * Function:  RawModErrorHandler.addNewError()
    *
    *      Adds a new error to this.errorStack
    *
@@ -66,10 +81,12 @@ export default class RawModErrorHandler {
    */
   addNewError (rawModErrorObject) {
     this.errorStack.push(rawModErrorObject)
+
+    return rawModErrorObject.errorNumber
   }
 
   /*
-   * Function:  RawModError.createNewError()
+   * Function:  RawModErrorHandler.createNewError()
    *
    *      Creates and returns a RawModError object
    *
@@ -87,6 +104,6 @@ export default class RawModErrorHandler {
     const callerInfo = callerID.getData(this.createNewError)
 
     // Return the new RarModError
-    return new RawModError(callerInfo.filePath, callerInfo.functionName, new Date(), errorObject, referenceID)
+    return new RawModError(callerInfo.filePath, callerInfo.functionName, new Date(), errorObject, referenceID, this.errorCounter++)
   }
 }
