@@ -13,7 +13,7 @@ const KnxDeviceResourceInformation = {
   },
   __getResourceInfoSetByMaskVersionStr: maskVersionStr => {
     return KnxDeviceResourceInformation.resources.filter(resource => {
-      if (resource.maskVersionStr === maskVersionStr) {
+      if (resource.ID === maskVersionStr) {
         return resource.resources
       }
     })[0]
@@ -23,14 +23,14 @@ const KnxDeviceResourceInformation = {
 
     // Check whether maskVersion is a string or a number and call the fitting function to get the maskversions resources
     if (typeof maskVersion === 'number') {
-      resources = KnxDeviceResourceInformation.__getResourceInfoSetByMaskVersion(maskVersion).resources
+      resources = KnxDeviceResourceInformation.__getResourceInfoSetByMaskVersion(maskVersion)
     } else if (typeof maskVersion === 'string') {
-      resources = KnxDeviceResourceInformation.__getResourceInfoSetByMaskVersionStr(maskVersion).resources
+      resources = KnxDeviceResourceInformation.__getResourceInfoSetByMaskVersionStr(maskVersion)
     }
 
     // Filter out the correct resource
     if (resources) {
-      return resources.filter(resource => {
+      return resources.resources.filter(resource => {
         if (resource.name === resourceName) {
           return resource
         }
