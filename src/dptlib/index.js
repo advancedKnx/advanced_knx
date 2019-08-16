@@ -83,7 +83,7 @@ dpts.resolve = function(dptid) {
 dpts.populateAPDU = function(value, apdu, dptid) {
   var dpt = dpts.resolve(dptid || 'DPT1');
   var nbytes = Math.ceil(dpt.basetype.bitlength / 8);
-  apdu.data = new Buffer(nbytes);
+  apdu.data = Buffer.alloc(nbytes);
   apdu.bitlength = dpt.basetype && dpt.basetype.bitlength || 1;
   var tgtvalue = value;
   // get the raw APDU data for the given JS value
