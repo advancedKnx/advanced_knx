@@ -95,7 +95,7 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  writeDeviceResource: async (target, source, deviceMaskversion, resourceNameStr, preferredReadType, value, recvTimeout, conContext, errContext) => {
+  writeDeviceResource: async (target, source, deviceMaskversion, resourceNameStr, preferredWriteType, value, recvTimeout, conContext, errContext) => {
     return new Promise(async resolve => {
       /** Local variables **/
       let deviceResourceInformation
@@ -157,17 +157,17 @@ export default {
       const chooseWriteMethodFunction = () => {
         if (writeViaPropertyAvailable && writeViaMemAccessAvailable) {
           // Both are available - choose based on the preferred method
-          if (preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY) {
+          if (preferredWriteType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY) {
             writeMethodFunction = __KnxWriteResourceViaMemory
           } else {
             writeMethodFunction = __KnxWriteResourceViaProperty
           }
         } else if (!writeViaMemAccessAvailable &&
-          preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY_STRICT) {
+          preferredWriteType === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY_STRICT) {
           // Using direct memory access forced but not possible - error
           writeMethodFunction = undefined
         } else if (!writeViaPropertyAvailable &&
-          preferredReadType === KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY_STRICT) {
+          preferredWriteType === KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY_STRICT) {
           // Using property access forced but not possible - error
           writeMethodFunction = undefined
         } else if (writeViaMemAccessAvailable) {
