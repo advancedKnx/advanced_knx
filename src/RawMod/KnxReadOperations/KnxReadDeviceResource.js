@@ -170,7 +170,7 @@ export default {
         if (!(readViaMemAccessAvailable || readViaPropertyAvailable)) {
           err = new Error(RawModErrors.NO_READ_WAY_FOUND.errorMsg)
           rawModErr = errContext.createNewError(err, RawModErrors.NO_READ_WAY_FOUND.errorID)
-          retVal = errContext.addNewError(rawModErr)
+          retVal.error = errContext.addNewError(rawModErr)
 
           return 1
         }
@@ -205,7 +205,7 @@ export default {
         if (!readMethodFunction) {
           err = new Error(RawModErrors.NO_READ_WAY_MATCHED.errorMsg)
           rawModErr = errContext.createNewError(err, RawModErrors.NO_READ_WAY_MATCHED.errorID)
-          retVal = errContext.addNewError(rawModErr)
+          retVal.error = errContext.addNewError(rawModErr)
 
           return 1
         }
