@@ -19,7 +19,7 @@
   "scripts": {
     "build": "babel src -d dist",
     "lint": "eslint src",
-    "liveTest": "babel-node test/RawMod/liveTest.js",
+    "liveTest": "babel-node test/RawMod/liveTest.js --trace-warnings",
     "functionTests": "babel-node test/RawMod/functionTests.js",
     "test": "babel test -d dist/test; babel src -d dist/src; cp package.json dist/package.json; multi-tape dist/test/test-*.js",
     "cleanup": "rm -r dist/*"
@@ -53,6 +53,7 @@
     "caller-id": "^0.1.0",
     "ipaddr.js": "1.2.0",
     "jshint": "^2.10.2",
+    "lodash": "^4.17.15",
     "log-driver": "1.2.7",
     "machina": "^2.0.0-1"
   }
