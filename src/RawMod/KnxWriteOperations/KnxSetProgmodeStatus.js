@@ -2,8 +2,8 @@
  * This file contains a function to read the progmode status of an KNX device *
  ******************************************************************************/
 
-import KnxWriteDevMem from './KnxWriteDevMem'
 import KnxConstants from '../../KnxConstants'
+import KnxWriteDeviceResource from './KnxWriteDeviceResource'
 
 export default {
   /*
@@ -52,13 +52,14 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  setProgmodeStatus: async (target, status, recvTimeout, conContext, errContext) => {
+  setProgmodeStatus: async (target, status, recvTimeout, maskVersion, conContext, errContext) => {
     /*
      * Pass the request to KnxWriteDevmem.writeDevMem()
      *      source (conContext.options.phsyAddr) is the KNX-device address of the KNX-IP interface
      *      address ([0x00, 0x60] == KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR) is the address of the position of the programming-mode flags on all KXN-devices
      */
-    return KnxWriteDevMem.writeDevMem(target, conContext.options.physAddr, KnxConstants.KNX_MEMORY_ADDRS.MEMORY_PROGMODE_ADDR,
-      Buffer.from([status]), recvTimeout, conContext, errContext)
+    return KnxWriteDeviceResource.writeDeviceResource(target, conContext.options.physAddr, maskVersion,
+      'ProgrammingMode', KnxConstants.RESOURCE_ACCESS_TYPES.ALL, Buffer.from([status]),
+      recvTimeout, conContext, errContext)
   }
 }
