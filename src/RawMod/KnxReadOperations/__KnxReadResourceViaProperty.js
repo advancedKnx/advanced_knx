@@ -7,7 +7,7 @@ export default async (target, source, deviceResourceInformation, recvTimeout, co
   const objectIndex = deviceResourceInformation.interfaceObjectRef || 0
   const startIndex = 1 // by default
   const propertyID = deviceResourceInformation.propertyID
-  const elementCount = deviceResourceInformation.length // elementCount = Bytes = Length
+  const elementCount = 1 // by default
 
   // Send the request and return the result
   return KnxReadPropertyValue.readPropertyValue(target, source, objectIndex, startIndex,
