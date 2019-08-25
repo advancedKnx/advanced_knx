@@ -181,90 +181,44 @@ KnxConstants.RESOURCE_ACCESS_TYPES = {
   PROPERTY_STRICT: 0x04 // Only use property access
 }
 
-// Memory addresses useful when reading/writing data directly from/to a KNX device
-KnxConstants.KNX_MEMORY_ADDRS = {
-  MEMORY_PROGMODE_ADDR: [0x00, 0x60], // Address of the progmode flag
-  MEMORY_LOADSTATE_APP1_ADDR: [0xb6, 0xec], // Address of the loadstate of application one
-  MEMORY_LOADSTATE_APP2_ADDR: [0xb6, 0xed], // Address of the loadstate of application two
-  MEMORY_RUNSTATE_APP1_ADDR: [0x01, 0x01], // Address of the runstate of application one
-  MEMORY_RUNSTATE_APP2_ADDR: [0x01, 0x02], // Address of the runstate of application one
-  MEMORY_GROUP_ADDR_TBL_LOADSTATE_ADDR: [0xb6, 0xea], // Address of the group address table loadstate
-  MEMORY_GROUP_ASSOCIATION_TBL_LOADSTATE_ADDR: [0xb6, 0xeb] // Address of the group address association loadstate
-}
-
 // The two KNX address types
 KnxConstants.KNX_ADDR_TYPES = {
   GROUP: 1, // It is a group address
   DEVICE: 0 // It is a device address
 }
 
-// Device Property Information
-KnxConstants.KNX_DEV_PROPERTY_INFORMATION = {
-  SerialNumber: {
-    objectIndex: 0x00,
-    propertyID: 0x0b,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  ManufacturerID: {
-    objectIndex: 0x00,
-    propertyID: 0x0c,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  OrderNumber: {
-    objectIndex: 0x00,
-    propertyID: 0x0f,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  Application_1_ID: {
-    objectIndex: 0x03,
-    propertyID: 0x0d,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  // Application Runstates don't seem to be writable trough the Property interface
-  Application_1_RunState: {
-    objectIndex: 0x03,
-    propertyID: 0x06,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  Application_1_LoadState: {
-    objectIndex: 0x03,
-    propertyID: 0x05,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  Application_2_ID: {
-    objectIndex: 0x04,
-    propertyID: 0x0d,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  // Application Runstates don't seem to be writable trough the Property interface
-  Application_2_RunState: {
-    objectIndex: 0x04,
-    propertyID: 0x06,
-    elementCount: 0x01,
-    startIndex: 0x01
-  },
-  Application_2_LoadState: {
-    objectIndex: 0x04,
-    propertyID: 0x05,
-    elementCount: 0x01,
-    startIndex: 0x01
-  }
+// KNX LoadStateMachine states
+KnxConstants.KNX_LSM_STATES = {
+  ApplicationUnloaded: 0x00, // Application not loaded
+  ApplicationLoaded: 0x01, // Application loaded
+  ApplicationLoading: 0x02, // Application loading
+  ApplicationError: 0x03, // Application failed to load
+  ApplicationUnloading: 0x04, // Application unloading
+  ApplicationLoadCompleting: 0x05 // Checking application validity
 }
 
-// Different KNX device application runstates
-KnxConstants.KNX_DEV_APLLICATION_RUNSTATES = {
-  ApplicationOffline: 0x00,
-  ApplicationOnline: 0x01,
-  // Application Runstate 0x2 can apparently not be written to devices
-  ApplicationReady: 0x02,
-  ApplicationDisabled: 0x3
+// KNX LSM commands
+KnxConstants.KNX_LSM_CMDS = {
+  NOP: 0x00, // NOP
+  LoadApplication: 0x01, // Starts the application-load process
+  CompleteLoadApplication: 0x02, // Declares the application as loaded (when in 'Loading' state)
+  SpecialDataLoad: 0x03, // Transfers some data to the device - debugging/development
+  UnloadApplication: 0x04 // Starts the application-unload process
+}
+
+// KNX RunStateMachine states
+KnxConstants.KNX_RSM_STATES = {
+  ApplicationHalted: 0x00, // Application halted - not running
+  ApplicationRunning: 0x01, // Application running
+  ApplicationReady: 0x02, // Application ready
+  ApplicationTerminated: 0x3 // Application terminated - not running
+}
+
+// KNX RSM commands
+KnxConstants.KNX_RSM_CMDS = {
+  NOP: 0x00, // NOP
+  RestartApplication: 0x01, // Restart the application
+  HaltApplication: 0x02 // Halt the application
 }
 
 // The broadcast group address on every KNX bus
