@@ -30,6 +30,10 @@ export default {
    *                        65542 ('The target failed to respond!')
    *                      Type: Integer
    *
+   *      maskVersion     The maskversion of the device
+   *                      Used/Needed to get information on how to access the ProgrammingMode Flag on the device
+   *                      Type: Integer
+   *
    *      conContext      The KNX connection context - needed to operate with and on the connection to the KNX-IP interface
    *                      Type: require('advanced_knx').Connection()
    *
