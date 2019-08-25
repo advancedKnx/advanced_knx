@@ -121,7 +121,7 @@ export default {
       let deviceResourceInformation
       let readViaMemAccessAvailable = false
       let readViaPropertyAvailable = false
-      let readMethodFunction
+      let readMethodFunction = null
       let rawModErr
       let err
 
@@ -221,6 +221,16 @@ export default {
       if (checkAvailableReadMethods()) { resolve(retVal); return }
       if (chooseReadMethodFunction()) { resolve(retVal); return }
       await readResource()
+
+      /*
+       * add the used access type to retval
+       * needed so that the caller knows how to handle the returned data
+       */
+      if (readMethodFunction === __KnxReadDeviceResourceViaMemory) {
+        retVal.usedAccessMethod = KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY
+      } else {
+        retVal.usedAccessMethod = KnxConstants.RESOURCE_ACCESS_TYPES.PROPERTY
+      }
 
       // Resolve the promise - retVal will be passed trough from the chosen read function
       resolve(retVal)
