@@ -2,7 +2,7 @@
  * This file contains a function to read application ID of an KNX device *
  *************************************************************************/
 
-import KnxReadPropertyValue from './KnxReadPropertyValue'
+import KnxReadDeviceResource from './KnxReadDeviceResource'
 import KnxConstants from '../../KnxConstants'
 import RawModErrors from '../Errors'
 
@@ -30,6 +30,10 @@ export default {
    *                        E.g.: 500, 1000, 250, 2000
    *                        Type: Number
    *
+   *      maskVersion       The maskversion of the device
+   *                        Used/Needed to get information on how to access the ProgrammingMode Flag on the device
+   *                        Type: Integer
+   *
    *      conContext        The KNX connection context
    *
    *      errContext        The RawMod error context
@@ -43,11 +47,11 @@ export default {
    *      }
    *
    *      If everything goes well, error will be zero and data will be the response-data of the target device
-   *      The following data represents the value of the requested property.
+   *      The following data represents the value of the application ID.
    *
    *        {
    *          error: 0,
-   *          data: Buffer.from([0x00, 0x83, 0x3f, 0xc4, 0xe0, 0x32])
+   *          data: Buffer.from([0x00, 0x83, 0x00, 0x22, 0x15])
    *        }
    *
    *      On error, error will be set to one and data will be null
@@ -70,39 +74,30 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  readApplicationID: async (target, applicationIndex, recvTimeout, conContext, errContext) => {
+  readApplicationID: async (target, applicationIndex, recvTimeout, maskVersion, conContext, errContext) => {
     return new Promise(async resolve => {
-      // Get the correct objectIndex
-      let objectIndex
+      let resourceName
 
-      if (applicationIndex === 1) {
-        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_ID.objectIndex
-      } else if (applicationIndex === 2) {
-        objectIndex = KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_2_ID.objectIndex
+      // Get the correct resource name
+      if (applicationIndex === 0) {
+        resourceName = 'ApplicationId'
       } else {
-        const err = new Error(RawModErrors.INVALID_ARGVAL.errorMsg)
-        const rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGVAL)
-
-        errContext.addNewError(rawModErr)
-
-        resolve({ error: 1, data: null })
-
-        return
+        resourceName = 'PeiprogId'
       }
 
-      /*
-       * Pass the request to KnxReadPropertyValue.readPropertyValue()
-       */
-      let val = await KnxReadPropertyValue.readPropertyValue(target, conContext.options.physAddr,
-        objectIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_ID.startIndex,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_ID.propertyID,
-        KnxConstants.KNX_DEV_PROPERTY_INFORMATION.Application_1_ID.elementCount,
-        recvTimeout, conContext, errContext)
+      // read the resource
+      const val = await KnxReadDeviceResource.readDeviceResource(target, null, maskVersion,
+        resourceName, KnxConstants.RESOURCE_ACCESS_TYPES.ALL, recvTimeout, conContext, errContext)
 
       if (!val.error) {
-        // Cut of the first four bytes
-        val.data = val.data.slice(4)
+        // Cut of the first n bytes - n depends on the access way used
+        if (val.usedAccessMethod === KnxConstants.RESOURCE_ACCESS_TYPES.MEMORY) {
+          // Used memory address - cut off first three bytes
+          val.applicationID = val.data.slice(3)
+        } else {
+          // Used property access - cut off first four bytes
+          val.applicationID = val.data.slice(4)
+        }
       }
 
       // Return the result
