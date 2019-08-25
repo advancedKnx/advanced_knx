@@ -4,7 +4,6 @@
 
 import KnxReadDeviceResource from './KnxReadDeviceResource'
 import KnxConstants from '../../KnxConstants'
-import RawModErrors from '../Errors'
 
 export default {
   /*
