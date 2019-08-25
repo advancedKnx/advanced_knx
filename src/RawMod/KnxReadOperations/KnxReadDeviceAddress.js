@@ -11,7 +11,7 @@ import KnxAddress from '../KnxAddress'
 
 export default {
   /*
-   * Function: KnxGetDeviceAddress.getDeviceAddress()
+   * Function: KnxGetDeviceAddress.readDeviceAddress()
    *
    *      !!! There has to be EXACTLY ONE DEVICE, the target device, on the bus that is in programming mode !!!
    *
@@ -55,7 +55,7 @@ export default {
    *
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
    */
-  getDeviceAddress: async (recvTimeout, conContext, errContext) => {
+  readDeviceAddress: async (recvTimeout, conContext, errContext) => {
     /*
      * The process works like following:
      *      ** Assume that the target device is in programming mode **

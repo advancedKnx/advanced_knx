@@ -16,7 +16,7 @@ export default {
    *
    *      This function writes the device address to an KNX device by broadcasting a PhysicalAddress_Write request onto the bus
    *      The target, which is in programming mode => listening for broadcast messages, will accept the new address
-   *      The stressfulness can be checked by using KnxGetDeviceAddress.getDeviceAddress() to read the address from the device
+   *      If successful can be checked by using KnxGetDeviceAddress.readDeviceAddress() to read the address from the device
    *
    * Arguments:
    *      newAddr         The new address of the device. E.g.: 1.2.3 or 10.12.25, ...
