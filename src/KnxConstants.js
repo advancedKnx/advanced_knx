@@ -173,6 +173,10 @@ KnxConstants.KNX_TPCI_SUBTYPES = {
 // Information about KNX device resources (memory addresses and property IDs + data lengths)
 KnxConstants.KNX_DEV_RESOURCE_INFORMATION = KnxDeviceResourceInformation
 
+/*
+ * Values for different ways of accessing a device resource - used as parameter for Knx[Read, Write]DeviceResource
+ * also used by KnxReadDeviceResource to report which access type was used
+ */
 KnxConstants.RESOURCE_ACCESS_TYPES = {
   ALL: 0x00, // Use any way of access
   MEMORY: 0x01, // Prefer using direct memory access
