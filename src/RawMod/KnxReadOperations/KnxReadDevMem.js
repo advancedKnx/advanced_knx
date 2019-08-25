@@ -62,8 +62,8 @@ export default {
    *          data: Buffer.from([0x01, 0x00, 0x60, 0x01])
    *        }
    *
-   *      ... being a example MemoryResponse
-   *      The first bytes being the amount of bytes read. The second two bytes, the memory address that the data was read from - 0x0060,
+   *      ... being an example MemoryResponse
+   *      The first byte being the amount of bytes read. The second two bytes, the memory address that the data was read from - 0x0060,
    *        represent the address of the programming mode flag
    *      The data, being 0x01, means that the device is in programming mode
    *
