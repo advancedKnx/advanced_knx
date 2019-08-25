@@ -29,6 +29,8 @@ import KnxReadMaskversion from './KnxReadOperations/KnxReadMaskversion'
 import KnxReadDeviceResource from './KnxReadOperations/KnxReadDeviceResource'
 import KnxWriteDeviceResource from './KnxWriteOperations/KnxWriteDeviceResource'
 import KnxRestartDevice from './KnxSpecialOperations/KnxRestartDevice'
+import KnxLoadStateMachine from './KnxSpecialOperations/LoadStateMachine'
+import KnxRunStateMachine from './KnxSpecialOperations/RunStateMachine'
 
 // The RawMod class - providing useful definitions and functions
 export default class RawMod {
@@ -79,5 +81,7 @@ export default class RawMod {
     this.KnxReadDeviceResource = KnxReadDeviceResource
     this.KnxWriteDeviceResource = KnxWriteDeviceResource
     this.KnxRestartDevice = KnxRestartDevice
+    this.KnxLoadStateMachine = KnxLoadStateMachine
+    this.KnxRunStateMachine = KnxRunStateMachine
   }
 }
