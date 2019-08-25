@@ -19,8 +19,6 @@ import KnxSetApplicationRunstate from './KnxWriteOperations/KnxSetApplicationRun
 import KnxReadSerialNumber from './KnxReadOperations/KnxReadSerialNumber'
 import KnxReadOrderNumber from './KnxReadOperations/KnxReadOrderNumber'
 import KnxReadApplicationID from './KnxReadOperations/KnxReadApplicationID'
-import KnxReadApplicationRunstate from './KnxReadOperations/KnxReadApplicationRunstate'
-import KnxReadApplicationLoadstate from './KnxReadOperations/KnxReadApplicationLoadstate'
 import KnxReadGroupAddrTblLoadstate from './KnxReadOperations/KnxReadGroupAddrTblLoadstate'
 import KnxReadGroupAssociationTblLoadstate from './KnxReadOperations/KnxReadGroupAssociationTblLoadstate'
 import KnxReadManufacturerID from './KnxReadOperations/KnxReadManufacturerID'
@@ -71,8 +69,6 @@ export default class RawMod {
     this.KnxReadSerialNumber = KnxReadSerialNumber
     this.KnxReadOrderNumber = KnxReadOrderNumber
     this.KnxReadApplicationID = KnxReadApplicationID
-    this.KnxReadApplicationRunstate = KnxReadApplicationRunstate
-    this.KnxReadApplicationLoadstate = KnxReadApplicationLoadstate
     this.KnxReadGroupAddrTblLoadState = KnxReadGroupAddrTblLoadstate
     this.KnxReadGroupAssociationTblLoadState = KnxReadGroupAssociationTblLoadstate
     this.KnxReadManufacturerID = KnxReadManufacturerID
