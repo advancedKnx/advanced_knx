@@ -140,7 +140,7 @@ export default {
         if (!deviceResourceInformation) {
           err = new Error(RawModErrors.INVALID_MV_RN.errorMsg)
           rawModErr = errContext.createNewError(err, RawModErrors.INVALID_MV_RN.errorID)
-          retVal = errContext.addNewError(rawModErr)
+          retVal.error = errContext.addNewError(rawModErr)
 
           return 1
         }
