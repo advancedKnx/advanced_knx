@@ -23,7 +23,7 @@ const getRSMState = async (target, source, maskVersion, recvTimeout, conContext,
     preferredReadType, recvTimeout, conContext, errContext)
 
   // Check if data was returned - if so, copy the runstate into a separate field
-  if (retval.data.length && retval.data.length > 0) {
+  if (retval.data && retval.data.length > 0) {
     retval.runstate = _.last(retval.data)
   }
 

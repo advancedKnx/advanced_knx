@@ -23,7 +23,7 @@ const getLSMState = async (target, source, maskVersion, recvTimeout, conContext,
     preferredReadType, recvTimeout, conContext, errContext)
 
   // Check if data was returned - if so, copy the loadstate into a separate field
-  if (retval.data.length && retval.data.length > 0) {
+  if (retval.data && retval.data.length > 0) {
     retval.loadstate = _.last(retval.data)
   }
 
