@@ -15,7 +15,6 @@ import KnxGetDeviceAddress from './KnxReadOperations/KnxReadDeviceAddress'
 import KnxSetDeviceAddress from './KnxWriteOperations/KnxSetDeviceAddress'
 import KnxGetProgmodeStatus from './KnxReadOperations/KnxReadProgmodeStatus'
 import KnxSetProgmodeStatus from './KnxWriteOperations/KnxSetProgmodeStatus'
-import KnxSetApplicationRunstate from './KnxWriteOperations/KnxSetApplicationRunstate'
 import KnxReadSerialNumber from './KnxReadOperations/KnxReadSerialNumber'
 import KnxReadOrderNumber from './KnxReadOperations/KnxReadOrderNumber'
 import KnxReadApplicationID from './KnxReadOperations/KnxReadApplicationID'
@@ -64,7 +63,6 @@ export default class RawMod {
     this.KnxGetProgmodeStatus = KnxGetProgmodeStatus
     this.KnxSetProgmodeStatus = KnxSetProgmodeStatus
     this.KnxSetDeviceAddress = KnxSetDeviceAddress
-    this.KnxSetApplicationRunstate = KnxSetApplicationRunstate
     this.KnxGetDeviceAddress = KnxGetDeviceAddress
     this.KnxReadSerialNumber = KnxReadSerialNumber
     this.KnxReadOrderNumber = KnxReadOrderNumber
