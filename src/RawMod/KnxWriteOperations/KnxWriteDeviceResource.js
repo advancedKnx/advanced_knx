@@ -75,9 +75,9 @@ export default {
    *                          Type: require('advanced_knx').RawMod.errorHandler
    *
    * Return:
-   *      Returns a promise which resolves with zero on success and with a number != 0 if something went wrong
+   *      Returns a promise which resolves with zero on success and with ERRNUM if something went wrong
    *      If the second is the case, an error will be added to errContext.errorStack
-   *      In this case, the returned number can be used to get the error from the errorStack
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:

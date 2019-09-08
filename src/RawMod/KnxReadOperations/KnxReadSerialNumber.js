@@ -51,14 +51,15 @@ export default {
    *          data: Buffer.from([0x00, 0x83, 0x3f, 0xc4, 0xe0, 0x32])
    *        }
    *
-   *      On error, error will be set to one and data will be null
+   *      On error, error will be set to ERRNUM and data will be null
    *
    *        {
-   *          error: 1,
+   *          error: ERRNUM,
    *          data: null
    *        }
    *
    *      If the second is the case, an error will be added to errContext.errorStack
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:

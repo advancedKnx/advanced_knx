@@ -45,10 +45,11 @@ export default {
    *
    *        {
    *          data: null,
-   *          error: 1
+   *          error: ERRNUM
    *        }
    *
-   *      on error ...
+   *      ... on error
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:

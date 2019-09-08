@@ -29,8 +29,9 @@ export default {
    *                      Type: require('advanced_knx').RawMod.errorHandler
    *
    * Return:
-   *      Returns a promise which resolves with zero on success and with one if something went wrong
+   *      Returns a promise which resolves with zero on success and with ERRNUM if something went wrong
    *      If the second is the case, an error will be added to errContext.errorStack
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:
@@ -58,6 +59,8 @@ export default {
 
       // This function validates the arguments
       const checkArguments = () => {
+        let errnum = 0
+
         // This function checks if all the arguments are defined
         const checkArgumentsDefined = () => {
           // Check if the errContext is defined
@@ -70,7 +73,7 @@ export default {
             err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
             rawModErr = errContext.createNewError.errorID(err, RawModErrors.UNDEF_ARGS)
 
-            errContext.addNewError(rawModErr)
+            errnum = errContext.addNewError(rawModErr)
 
             return 1
           }
@@ -82,15 +85,15 @@ export default {
             err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
             rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
-            errContext.addNewError(rawModErr)
+            errnum = errContext.addNewError(rawModErr)
 
             return 1
           }
         }
 
         // Call the checking functions
-        if (checkArgumentsDefined()) { return 1 }
-        if (checkArgumentTypes()) { return 1 }
+        if (checkArgumentsDefined()) { return errnum }
+        if (checkArgumentTypes()) { return errnum }
       }
 
       // This function converts the new address from string to buffer
@@ -102,9 +105,9 @@ export default {
           err = new Error(RawModErrors.INVALID_NEWADDRESS.errorMsg)
           rawModErr = errContext.createNewError(err, RawModErrors.INVALID_NEWADDRESS.errorID)
 
-          errContext.addNewError(rawModErr)
+          const errnum = errContext.addNewError(rawModErr)
 
-          return 1
+          return errnum
         }
       }
 
@@ -125,20 +128,25 @@ export default {
               rawModErr = errContext.createNewError(sendErr, null)
 
               // Push it onto the errorStack
-              errContext.addNewError(rawModErr)
+              const errnum = errContext.addNewError(rawModErr)
 
               // Return 1
-              resolve(1)
+              resolve(errnum)
             }
           })
         })
       }
 
+      let e
+
       // Call all functions defined above
-      if (checkArguments()) { resolve(1); return }
-      if (prepareNewAddr()) { resolve(1); return }
+      e = checkArguments()
+      if (e) { resolve(e); return }
+      e = prepareNewAddr()
+      if (e) { resolve(e); return }
       forgeMessages()
-      if (await sendPhysicalAddressWriteRequest()) { resolve(1) }
+      e = await sendPhysicalAddressWriteRequest()
+      if (e) { resolve(e) }
     })
   }
 }

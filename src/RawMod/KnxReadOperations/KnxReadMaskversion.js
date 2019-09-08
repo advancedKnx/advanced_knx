@@ -59,14 +59,15 @@ export default {
    *
    *      Being the maskversion (represented as number) of the target device
    *
-   *      On error, error will be set to one and data will be null
+   *      On error, error will be set to ERRNUM and data will be null
    *
    *        {
-   *          error: 1,
+   *          error: ERRNUM,
    *          data: null
    *        }
    *
    *      If the second is the case, an error will be added to errContext.errorStack
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:
@@ -101,6 +102,8 @@ export default {
 
       // This function validates the arguments
       const checkArguments = () => {
+        let errnum = 0
+
         // This function checks if all the arguments are defined
         const checkArgumentsDefined = () => {
           // Check if the errContext is defined
@@ -113,7 +116,7 @@ export default {
             err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
             rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS)
 
-            errContext.addNewError(rawModErr)
+            errnum = errContext.addNewError(rawModErr)
 
             return 1
           }
@@ -125,7 +128,7 @@ export default {
             err = new Error(RawModErrors.INVALID_ARGTYPES.errorMsg)
             rawModErr = errContext.createNewError(err, RawModErrors.INVALID_ARGTYPES.errorID)
 
-            errContext.addNewError(rawModErr)
+            errnum = errContext.addNewError(rawModErr)
 
             return 1
           }
@@ -141,7 +144,7 @@ export default {
             err = new Error(RawModErrors.INVALID_TARGET.errorMsg)
             rawModErr = errContext.createNewError(err, RawModErrors.INVALID_TARGET.errorID)
 
-            errContext.addNewError(rawModErr)
+            errnum = errContext.addNewError(rawModErr)
 
             retVal = 1
           }
@@ -153,7 +156,7 @@ export default {
               err = new Error(RawModErrors.INVALID_SOURCE.errorMsg)
               rawModErr = errContext.createNewError(err, RawModErrors.INVALID_SOURCE.errorID)
 
-              errContext.addNewError(rawModErr)
+              errnum = errContext.addNewError(rawModErr)
 
               retVal = 1
             }
@@ -164,9 +167,9 @@ export default {
         }
 
         // Call the checking functions
-        if (checkArgumentsDefined()) { return 1 }
-        if (checkArgumentTypes()) { return 1 }
-        if (checkTargetAndSource()) { return 1 }
+        if (checkArgumentsDefined()) { return errnum }
+        if (checkArgumentTypes()) { return errnum }
+        if (checkTargetAndSource()) { return errnum }
       }
 
       // This function forges all the needed messages
@@ -198,9 +201,9 @@ export default {
         KnxNetProtocol.sendTunnRequest(ackMsg, conContext, function (sendErr) {
           if (sendErr) {
             rawModErr = errContext.createNewError(sendErr, null)
-            errContext.addNewError(rawModErr)
+            const errnum = errContext.addNewError(rawModErr)
 
-            resolve({ error: 1, data: null })
+            resolve({ error: errnum, data: null })
 
             return
           }
@@ -209,9 +212,9 @@ export default {
           KnxNetProtocol.sendTunnRequest(dconnMsg, conContext, function (sendErr) {
             if (sendErr) {
               rawModErr = errContext.createNewError(sendErr, null)
-              errContext.addNewError(rawModErr)
+              const errnum = errContext.addNewError(rawModErr)
 
-              resolve({ error: 1, data: null })
+              resolve({ error: errnum, data: null })
 
               return
             }
@@ -250,10 +253,10 @@ export default {
               rawModErr = errContext.createNewError(sendErr, null)
 
               // Push it onto the errorStack
-              errContext.addNewError(rawModErr)
+              const errnum = errContext.addNewError(rawModErr)
 
-              // Return 1
-              resolve(1)
+              // Return errnum
+              resolve(errnum)
             } else {
               // Send the dev descr read request
               KnxNetProtocol.sendTunnRequest(devDescrReadReq, conContext, sendErr => {
@@ -263,10 +266,10 @@ export default {
                   rawModErr = errContext.createNewError(sendErr, null)
 
                   // Push it onto the errorStack
-                  errContext.addNewError(rawModErr)
+                  const errnum = errContext.addNewError(rawModErr)
 
-                  // Return 1
-                  resolve(1)
+                  // Return errnum
+                  resolve(errnum)
                 }
               })
             }
@@ -291,20 +294,24 @@ export default {
           rawModErr = errContext.createNewError(err, RawModErrors.TIMEOUT_REACHED.errorID)
 
           // Push it onto the errorStack
-          errContext.addNewError(rawModErr)
+          const errnum = errContext.addNewError(rawModErr)
 
-          // Return 1
-          resolve({ error: 1, data: null })
+          // Return the error number
+          resolve({ error: errnum, data: null })
         }, recvTimeout)
       }
 
+      let e
+
       // Call all functions defined above
-      if (checkArguments()) { resolve({ error: 1, data: null }); return }
+      e = checkArguments()
+      if (e) { resolve({ error: e, data: null }); return }
       forgeMessages()
       prepareCustomMessageHandlerTemplates()
       registerHandler()
       createRecvTimeout(resolve)
-      if (await sendConnAndReadReq()) { resolve({ error: 1, data: null }) }
+      e = await sendConnAndReadReq()
+      if (e) { resolve({ error: e, data: null }) }
     })
   }
 }

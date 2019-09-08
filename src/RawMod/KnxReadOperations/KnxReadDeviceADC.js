@@ -65,14 +65,15 @@ export default {
    *
    *      The first byte being the channel. The second byte being the count. The last two bytes being the ADC data
    *
-   *      On error, error will be set to one and data will be null
+   *      On error, error will be set to ERRNUM and data will be null
    *
    *        {
-   *          error: 1,
+   *          error: ERRNUM,
    *          data: null
    *        }
    *
    *      If the second is the case, an error will be added to errContext.errorStack
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:

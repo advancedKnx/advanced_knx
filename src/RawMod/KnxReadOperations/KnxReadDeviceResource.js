@@ -89,16 +89,15 @@ export default {
    *      The first two bytes being the memory address, followed by n data bytes
    *      The example shows a response a response containing data (0x01) read from 0x0060 (ProgrammingMode, in most cases)
    *
-   *      On error, error will be set to a number != 0 and data will be null
+   *      On error, error will be set to ERRNUM and data will be null
    *
    *        {
-   *          error: 1,
+   *          error: ERRNUM,
    *          data: null
    *        }
    *
    *      If the second is the case, an error will be added to errContext.errorStack
-   *      Error will be set to the number of the error pushed onto the errorStack, it can be used to get the error
-   *      from the errorStack
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:

@@ -42,10 +42,11 @@ export default {
    *
    *        {
    *          data: null,
-   *          error: 1
+   *          error: ERRNUM
    *        }
    *
    *      on error ...
+   *      The error can be retrieved by using errContext.getErrorByNumber(ERRNUM)
    *      Type: Promise
    *
    * Errors:
@@ -169,10 +170,10 @@ export default {
               rawModErr = errContext.createNewError(sendErr, null)
 
               // Push it onto the errorStack
-              errContext.addNewError(rawModErr)
+              const errnum = errContext.addNewError(rawModErr)
 
-              // Return 1
-              resolve(1)
+              // Return errnum
+              resolve(errnum)
             }
           })
         })
@@ -195,19 +196,23 @@ export default {
           rawModErr = errContext.createNewError(err, RawModErrors.TIMEOUT_REACHED.errorID)
 
           // Push it onto the errorStack
-          errContext.addNewError(rawModErr)
+          const errnum = errContext.addNewError(rawModErr)
 
           // Return 1
-          resolve({ error: 1, data: null })
+          resolve({ error: errnum, data: null })
         }, recvTimeout)
       }
 
+      let e
+
       // Call all functions defined above
-      if (checkArguments()) { resolve({ error: 1, data: null }); return }
+      e = checkArguments()
+      if (e) { resolve({ error: e, data: null }); return }
       forgeMessages()
       registerHandler()
       createRecvTimeout(resolve)
-      if (await sendPhysicalAddressRequest()) { resolve({ error: 1, data: null }) }
+      e = await sendPhysicalAddressRequest()
+      if (e) { resolve({ error: e, data: null }) }
     })
   }
 }
