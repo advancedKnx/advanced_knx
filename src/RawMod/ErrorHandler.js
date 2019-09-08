@@ -78,6 +78,8 @@ export default class RawModErrorHandler {
    *
    * Arguments:
    *      rawModErrorObject   A RawModErrorHandler.RawModError object which will be pushed onto this.errorStack
+   *
+   * Returns the number of the added error
    */
   addNewError (rawModErrorObject) {
     this.errorStack.push(rawModErrorObject)
