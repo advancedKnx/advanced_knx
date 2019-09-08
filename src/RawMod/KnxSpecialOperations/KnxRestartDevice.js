@@ -14,7 +14,7 @@ export default {
    *
    *      This functions can be used to restart a KNX device
    *      Logically, it restarts all applications running on the device
-   *      But that is not the case if an application is in runstate three (KnxConstants.KNX_DEV_APLLICATION_RUNSTATES)
+   *      But that is not the case if an application is in runstate three (KnxConstants.KNX_RSM_STATES)
    *
    * Arguments:
    *      target          The target device address
@@ -53,7 +53,6 @@ export default {
       let err
       let rawModErr
       let connReq
-      let dconnReq
       let deviceRestartMsg
 
       // This function validates the arguments
@@ -130,11 +129,10 @@ export default {
       const forgeMessages = () => {
         deviceRestartMsg = KnxMessageTemplates.deviceRestartRequest(target, source)
         connReq = KnxMessageTemplates.ucdConnRequest(target, source)
-        dconnReq = KnxMessageTemplates.ucdDconnMsg(target, source)
       }
 
-      // This function sends 'physicalAddressReadMsg', the connect and disconnect request to the target
-      const sendConnDeviceRestartDconnRequest = () => {
+      // This function sends the connect and the restart request to the target - restart will disconnect automatically
+      const sendConnDeviceRestartRequest = () => {
         return new Promise(resolve => {
           // Send the UCD connect request
           KnxNetProtocol.sendTunnRequest(connReq, conContext, function (sendErr) {
@@ -160,20 +158,6 @@ export default {
 
                   // Return 1
                   resolve(1)
-                } else {
-                  // Send the UCD disconnect request
-                  KnxNetProtocol.sendTunnRequest(dconnReq, conContext, function (sendErr) {
-                    if (sendErr) {
-                      // Create the RawModError object
-                      rawModErr = errContext.createNewError(sendErr, null)
-
-                      // Push it onto the errorStack
-                      errContext.addNewError(rawModErr)
-
-                      // Return 1
-                      resolve(1)
-                    }
-                  })
                 }
               })
             }
@@ -184,7 +168,7 @@ export default {
       // Call all functions defined above
       if (checkArguments()) { resolve(1); return }
       forgeMessages()
-      if (await sendConnDeviceRestartDconnRequest()) { resolve(1) }
+      if (await sendConnDeviceRestartRequest()) { resolve(1) }
     })
   }
 }
