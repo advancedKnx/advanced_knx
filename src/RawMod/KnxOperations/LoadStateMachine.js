@@ -3,9 +3,9 @@
  * Information on this can be found in README-operation_rawmod.md
  */
 
-import KnxReadDeviceResource from '../KnxReadOperations/KnxReadDeviceResource'
+import KnxReadDeviceResource from '../__KnxReadOperations/KnxReadDeviceResource'
 import KnxConstants from '../../KnxConstants'
-import KnxWriteDeviceResource from '../KnxWriteOperations/KnxWriteDeviceResource'
+import KnxWriteDeviceResource from '../__KnxWriteOperations/KnxWriteDeviceResource'
 import _ from 'lodash'
 
 /*
