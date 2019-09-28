@@ -1,6 +1,6 @@
 {
   "name": "advanced_knx",
-  "version": "2.3.6",
+  "version": "2.3.61",
   "main": "dist/index.js",
   "author": "Noname <knx_code@protonmail.com>",
   "private": false,
