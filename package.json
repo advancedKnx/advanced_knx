@@ -17,6 +17,7 @@
     "node": ">=8"
   },
   "scripts": {
+    "postinstall": "babel src -d dist",
     "build": "babel src -d dist",
     "lint": "eslint src",
     "liveTest": "babel-node test/RawMod/liveTest.js --trace-warnings",
