@@ -204,6 +204,7 @@ const states = {
           KnxLog.get().debug('(%s):\tconnection timed out', sm.compositeState())
           sm.socket.close()
           sm.transition('uninitialized')
+          this.isConnected = false
           sm.emit('disconnected')
         }, 3000)
         //
@@ -227,6 +228,7 @@ const states = {
         KnxLog.get().debug('(%s):\tgot disconnect response', this.compositeState())
         this.socket.close()
         this.transition('uninitialized')
+        this.isConnected = false
         this.emit('disconnected')
       }
     }
