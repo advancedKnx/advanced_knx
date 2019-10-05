@@ -4,7 +4,6 @@
 */
 
 import RawModHandlers from './RawMod/Handlers'
-
 import FSM from './FSM'
 
 const util = require('util')
