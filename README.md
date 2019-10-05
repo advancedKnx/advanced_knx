@@ -1,35 +1,23 @@
-## ATTENTION: THIS VERSION OF ADVANCED_KNX HAS NO DOCUMENTATION
-* Please note that this is NOT the original knx.js repository!
-* It is a fork for another project adding some features like the base for an BusMonitor
-  or the ability to send self constructed messages. (...)
-* The original knx repository can be found at: https://bitbucket.org/ekarak/knx.js
-
-## KNXnet/IP for Node.JS
-
-A feature-complete [KNXnet/IP protocol stack](https://www.knx.org/en-us/knx/technology/developing/devices/ip-devices/index.php) in pure Javascript, capable of talking multicast (routing) and unicast (tunneling). Adding KNX to your Node.JS applications is now finally easy as pie.
-
-* Wide DPT (datapoint type) support (DPT1 - DPT20 supported)
-* Extensible Device support (binary lights, dimmers, ...)
-* If you got an IP router and a network that supports IP multicast, you can start talking to KNX within seconds!
-
+# KNXnet/IP for Node.JS
+Note that this is a fork of [https://bitbucket.org/ekarak/knx.js]
+## The KNX protocol
+- this documentation does NOT contain specific information about the KNX protocol
+- for information on the protocol see [https://my.knx.org/en/shop/knx-specifications] (it's free)
 ## Installation
-
-Make sure your machine has Node.JS (version 4.x or greater, and supports ECMA Script 6) and do:
-
-`npm install advanced_knx`
-
+Make sure your machine has Node.JS (version 8.x or greater) and do:
+```
+npm install advanced_knx
+```
 ## Baisc Usage
-
 Here is a quick example showing how to set up a KNXNet connection.
 This should be used for **TESTING** only.
-
 ```js
-import Knx from '../advanced_knx' // Import the KNX module
+Knx = require('advanced_knx') // Import the KNX module
 
 const connection = Knx.Connection({
   ipAddr: '192.168.1.102', // The IP-Address of the KNX-IP interface
   ipPort: 3671, // The port the KNX-IP is listening on
-  interface: 'enp0s8', // Local network interface to use for the connection (optional)
+  interface: 'enp5s0', // Local network interface to use for the connection (optional)
   logLevel: 'info', // Sets which information to print
   manualConnect: true, // If set to true, connection.Connect() has to be called - will be done automatically otherwise
   minimumDelay: 80, // Minimum time to pass between sending messages in milliseconds (Default: 0)
@@ -43,7 +31,7 @@ const connection = Knx.Connection({
       console.log('Connected!')
     },
     
-    // This is going to be called on every incoming messages (if it is relevant)
+    // This is going to be called on every incoming messages (only group communication)
     event: function (knxEvt, knxSrc, knxDest, knxValue) {
       console.log("%s **** KNX EVENT: %j, src: %j, dest: %j, value: %j",
         new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''), knxEvt, knxSrc, knxDest, knxValue)
@@ -100,11 +88,10 @@ const connection = Knx.Connection({
   }
 })
 ```
-
-## Development documentation
-
-- [Basic API usage](../master/README-API.md)
+## Documentation index
+- [Connection setup](../master/README-connection_setup.md)
+- [Example tool](../master/README-example_tool.md)
+- [DPTs und declaring devices](../master/README-basic_advanced.md)
 - [List of supported datapoints](../master/README-datapoints.md)
 - [List of supported events](../master/README-events.md)
 - [eibd/knxd compatibility](../master/README-knxd.md)
-- [On resilience](../master/README-resilience.md)
