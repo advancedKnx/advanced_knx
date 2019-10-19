@@ -123,7 +123,7 @@ export default {
           // Check if all the other parameters are defined
           if ((target == null) || (address == null) || (length == null) || (recvTimeout == null) || (conContext == null)) {
             err = new Error(RawModErrors.UNDEF_ARGS.errorMsg)
-            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS)
+            rawModErr = errContext.createNewError(err, RawModErrors.UNDEF_ARGS.errorID)
 
             errnum = errContext.addNewError(rawModErr)
 
