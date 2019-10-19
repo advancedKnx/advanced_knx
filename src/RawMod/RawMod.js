@@ -41,8 +41,9 @@ export default class RawMod {
     // Get some message templates
     this.KNX_MESSAGE_TEMPLATES = KnxMessageTemplates
 
-    // The RawMod error handler
+    // The RawMod error handler (+ provide function to create new handler)
     this.errorHandler = new ErrorHandler()
+    this.newErrorHandler = ErrorHandler
 
     // Get functions to work with the KnxNet protocol
     this.KnxNetProtocol = KnxNetProtocol
