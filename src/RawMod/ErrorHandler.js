@@ -18,7 +18,7 @@ export class RawModError {
 export default class RawModErrorHandler {
   constructor () {
     // A array of RawModError objects
-    this.errorCounter = 1
+    this.errorCounter = 0
     this.errorStack = []
   }
 
@@ -93,9 +93,6 @@ export default class RawModErrorHandler {
    *      Creates and returns a RawModError object
    *
    * Arguments:
-   *      filePath      The name of the file the error occurred in
-   *      functionName  The name of the function the error occurred in
-   *      time          The time the error occurred
    *      errorObject   A new Error() object describing the error
    *      referenceID   The reference ID of the error
    *
@@ -106,6 +103,6 @@ export default class RawModErrorHandler {
     const callerInfo = callerID.getData(this.createNewError)
 
     // Return the new RarModError
-    return new RawModError(callerInfo.filePath, callerInfo.functionName, new Date(), errorObject, referenceID, this.errorCounter++)
+    return new RawModError(callerInfo.filePath, callerInfo.functionName, new Date(), errorObject, referenceID, ++this.errorCounter)
   }
 }
