@@ -12,7 +12,6 @@ const ErrorMessages = {
   INVALID_READLEN: 'The length argument is invalid!',
   INVALID_TARGET: 'The target KNX address is invalid!',
   INVALID_SOURCE: 'The source KNX address is invalid!',
-  INVALID_NEWADDR: 'The new address is invalid!',
   TARGET_NOTACK: 'The target actively didn\'t acknowledge the request!',
   TIMEOUT_REACHED: 'The target failed to respond!',
   INVALID_NEWADDRESS: 'The new KNX address is invalid!',
