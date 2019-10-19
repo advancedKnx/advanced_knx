@@ -54,7 +54,7 @@
             ```
             - On error, `retval.error` will stores the error number of the RawModError ([README-rawmod_errors.md]) and `retval.data` will be null
                 - The error can be received like this
-                    ```js
+                    ```
                     err = errContext.getErrorByNumber(retval.error)
                     ```
             - On success, `retval.error` will be `0` and `retval.data` will look like this
@@ -71,3 +71,38 @@
                 | 2 | `0x60` - Byte 1 of the read-address |
                 | 3 | `0x01` - Data read |
                 - This example represents the response to a read-request on the programming-mode-flag address `0x0060` when the device is **not** in programming mode
+### Write device memory
+- To read device memory, the following function will be used
+    ```
+    knx.RawMod.KnxWriteDevMem.writeDevMem(target, source, address, data, recvTimeout, conContext, errContext)
+    ```
+    - `target`: See `Read device memory` above
+    - `source`: See `Read device memory` above
+    - `address`: See `Read device memory` above (except that it is about writing to it)
+    - `data` (`Buffer`): data to write to the device
+        - The data to be written to the device
+        - **It must be at least one and at most twelve bytes long**
+        ```
+        Buffer.from([0x01]), ...
+        ```
+    - `recvTimeout`: See `Read device memory` above
+    - `conContext`: See `Read device memory` above
+    - `errContext`: See `Read device memory` above
+    - **Errors**
+        - The following RawMod errors can occur
+            ```
+            UNDEF_ARGS
+            INVALID_ARGTYPES
+            INVALID_DATALEN
+            TARGET_NOTACK
+            TIMEOUT_REACHED
+            INVALID_TARGET
+            INVALID_SOURCE
+            ```
+            - See [README-rawmod_errors.md] -> Errors
+    - **Return Value**
+        - It will return `0` on success and with the ERRORNUMBER of the RawMod error on error
+        - The error can be received like this
+            ```
+            err = errContext.getErrorByNumber(ERRORNUMBER)
+            ```
