@@ -50,7 +50,7 @@ export default class KnxAddress {
    * Arguments:
    *
    *      grpAddrStr  A string representing a valid KNX group address
-   *                  E.g.: '31/2047', '31/7/255', '15.15.255', ...
+   *                  E.g.: '31/2047', '31/7/255', ...
    *                  Type: String
    *
    * Return:
@@ -70,7 +70,7 @@ export default class KnxAddress {
   }
 
   /*
-   * Function KnxAddress.getAddrType()
+   * Function KnxAddress.validateAddrStr()
    *
    *      This function validates KNX addresses
    *
@@ -216,7 +216,7 @@ export default class KnxAddress {
    * Return:
    *
    *      addrStr         addressBin converted into a string representing it
-   *                      E.g.: '31/2047', '31/7/255', '15.15.255', ...
+   *                      E.g.: '31/2047', '7/255', ...
    *                      Type: String
    */
   static binToStrGrpL2 (addressBin) {
