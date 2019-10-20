@@ -28,6 +28,8 @@ import KnxWriteDeviceResource from './__KnxWriteOperations/KnxWriteDeviceResourc
 import KnxRestartDevice from './KnxOperations/RestartDevice'
 import KnxLoadStateMachine from './KnxOperations/LoadStateMachine'
 import KnxRunStateMachine from './KnxOperations/RunStateMachine'
+import CustomMessageHandlers from './CustomMsgHandlers'
+import CustomMessageHandlerTemplates from './CustomMessageHandlerTemplates'
 
 // The RawMod class - providing useful definitions and functions
 export default class RawMod {
@@ -44,6 +46,10 @@ export default class RawMod {
     // The RawMod error handler (+ provide function to create new handler)
     this.errorHandler = new ErrorHandler()
     this.newErrorHandler = ErrorHandler
+
+    // RawMod custom message handler class
+    this.CustomMessageHandler = CustomMessageHandlers
+    this.CustomMessageHandlerTemplates = CustomMessageHandlerTemplates
 
     // Get functions to work with the KnxNet protocol
     this.KnxNetProtocol = KnxNetProtocol
