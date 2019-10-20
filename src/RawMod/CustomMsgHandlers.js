@@ -92,7 +92,7 @@ export default class RawModCustomMsgHandlers {
       conContext.handlers.customMsgHandlers = []
     }
 
-    // Get the length of conContext.handlers.customMsgHandlers before the deletion
+    // Get the length of conContext.handlers.customMsgHandlers before the addition
     const lengthBefore = conContext.handlers.customMsgHandlers.length
 
     // Add template and callback to the custom message handler array
@@ -101,7 +101,7 @@ export default class RawModCustomMsgHandlers {
       callback: callback
     })
 
-    // Return the length difference of conContext.handlers.customMsgHandlers before and after the deletion
+    // Return the length difference of conContext.handlers.customMsgHandlers before and after the addition
     return lengthBefore - conContext.handlers.customMsgHandlers.length
   }
 
@@ -131,8 +131,8 @@ export default class RawModCustomMsgHandlers {
    */
   static removeCustomMsgHandler (template, conContext) {
     if (!(template && conContext)) { return -1 }
-    if (!conContext.handlers) { return -1 }
-    if (!conContext.handlers.customMsgHandlers) { return -1 }
+    if (!conContext.handlers) { return 0 }
+    if (!conContext.handlers.customMsgHandlers) { return 0 }
 
     // Get the length of conContext.handlers.customMsgHandlers before the deletion
     const lengthBefore = conContext.handlers.customMsgHandlers.length
