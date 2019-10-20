@@ -5,7 +5,7 @@
 ### Read device memory
 - To read device memory, the following function will be used
     ```
-    knx.RawMod.KnxReadDevMem.readDevMem(target, source, address, length, recvTimeout, conContext, errContext)
+    knx.RawMod.KnxReadDevMem.readDevMem = async (target, source, address, length, recvTimeout, conContext, errContext) => {}
     ```
     - `target` (`string`): KNX target address string
         - Stores the device address of the target of the read operation. Examples:
@@ -74,7 +74,7 @@
 ### Write device memory
 - To read device memory, the following function will be used
     ```
-    knx.RawMod.KnxWriteDevMem.writeDevMem(target, source, address, data, recvTimeout, conContext, errContext)
+    knx.RawMod.KnxWriteDevMem.writeDevMem = async (target, source, address, data, recvTimeout, conContext, errContext) => {}
     ```
     - `target`: See `Read device memory` above
     - `source`: See `Read device memory` above
