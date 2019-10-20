@@ -2,7 +2,6 @@
  * This file contains a function to write a resource to a KNX device *
  *********************************************************************/
 
-// import RawModErrors from '../Errors
 import KnxConstants from '../../KnxConstants'
 import KnxDeviceResourceInformation from '../KnxDeviceResourceInformation'
 import __KnxWriteResourceViaMemory from './__KnxWriteResourceViaMemory'
@@ -15,7 +14,6 @@ export default {
    *
    *      This function writes the value of a resource to a KNX device
    *      Like the programming mode flag, manufacturer ID, application ID, ...
-   *      However, functions to read "special"-resources (like the ADC value) are stored in separate files
    *
    * Arguments:
    *
