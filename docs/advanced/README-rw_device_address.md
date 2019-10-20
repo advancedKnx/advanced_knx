@@ -1,4 +1,4 @@
-# Set device address
+# Set/Get KNX device address
 - This file is about reading and writing a physical KNX device addresses using this library
 - The following functions will be used for this
     ```js
