@@ -37,9 +37,7 @@ export default {
    * Errors:
    *      RawModErrors.UNDEF_ARGS - At least one argument is undefined
    *      RawModErrors.INVALID_ARGTYPES - At least one argument has an invalid type
-   *      RawModErrors.INVALID_ADDRESS - The address the was requested to be written is invalid
-   *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
-   *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
+   *      RawModErrors.INVALID_NEWADDRESS - The address the was requested to be written is invalid
    *
    *      There may be other errors not labeled by RawMod (thrown by the socket API when sending messages)
    */
