@@ -416,14 +416,14 @@ KnxProtocol.define('APDU', {
           // Parse the raw apdu
           const apdu = KnxProtocol.apduStruct.parse(hdr.apdu_raw)
 
-          // Get the tcpi value (Shift it to the right to make working with it easier)
+          // Get the tcpi value (Shift it to the left to make working with it easier)
           hdr.tpci = apdu.tpci << 2
 
           /* Check for special cases
            *
            *  Some APCI codes take the full ten bits while some store data in the lower six bits of the APCI field
            *
-           * Check if the ten APCI bits match any APCI code and if they have a greate value then KnxConstants.APCICODES.Memory_Read
+           * Check if the ten APCI bits match any APCI code and if they have a greater value then KnxConstants.APCICODES.Memory_Read
            *
            *  This would mean that the APCI code fills all ten bits - no data contained in the APCI field
            *
