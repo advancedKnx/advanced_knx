@@ -60,8 +60,6 @@ export default {
    *      RawModErrors.INVALID_TARGET - target isn't a valid KNX address
    *      RawModErrors.INVALID_SOURCE - source is defined and it isn't a valid KNX address
    *      RawModErrors.INVALID_MV_RN - The maskversion or resource name is invalid
-   *      RawModErrors.NO_WRITE_WAY_FOUND - No way to write the resource value found
-   *      RawModErrors.NO_WRITE_WAY_MATCHED - No way to write the resource value matches the criteria
    *      RawModErrors.NO_READ_WAY_FOUND - No way to read the resource found
    *      RawModErrors.NO_READ_WAY_MATCHED - No way to read the resource matches the criteria
    *      There may be other errors not labeled by RawMod (throw by the socket API when sending messages)
